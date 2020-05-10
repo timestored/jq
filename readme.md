@@ -36,8 +36,8 @@ Please [contact us](http://www.timestored.com/contact).
 
 ## Social Media
 
-[Twitter @TimeStored](https://twitter.com/timestored)
-[Google Group jq-user](https://groups.google.com/forum/#!forum/jq-user)
-[Youtube TimeStored](https://www.youtube.com/channel/UC4bHjf1d1FkXec0SFW5_1Dw)
-[Linkedin TimeStored](https://www.linkedin.com/company/timestored)
+ - [Twitter @TimeStored](https://twitter.com/timestored)  
+ - [Google Group jq-user](https://groups.google.com/forum/#!forum/jq-user)  
+ - [YouTube - TimeStored](https://www.youtube.com/channel/UC4bHjf1d1FkXec0SFW5_1Dw)
+ - [Linkedin TimeStored](https://www.linkedin.com/company/timestored)
 
