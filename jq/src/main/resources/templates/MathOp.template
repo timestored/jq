@@ -1,0 +1,33 @@
+package com.timestored.jq.ops; 
+import static com.timestored.jdb.database.SpecialValues.*;
+import com.timestored.jdb.col.*;
+
+import com.timestored.jdb.kexception.LengthException;
+
+
+public class MathOp extends BaseCastingDiadUniform {
+	public static MathOp INSTANCE = new MathOp(); 
+	@Override public String name() { return "%"; }
+
+	/**
+	 * In math operations anything on a null gives a null as it's not known.
+	 **/
+	
+    ##FOReachTYPE##
+    @Override public ##returntype## ex(##type## c, ##type## d) { 
+    	return ##returnCast## (c == n##typeChar## ? n##returnTypeChar## : d == n##typeChar## ? n##returnTypeChar## : ##returnCast## (c % d)); }
+
+    @Override public ##listtype## ex(##type## a, ##listtype## b) {
+        return a == n##typeChar## ? b.map(n##returnTypeChar##) : b.map(c -> (c == n##typeChar## ? c : ##returnCast## (a % c)));
+    }
+
+    @Override public ##listtype## ex(##listtype## a, ##type## b) {
+        return b == n##typeChar## ? a.map(n##returnTypeChar##) : a.map(c -> (c == n##typeChar## ? c : ##returnCast## (c % b)));
+    }
+
+    @Override public ##listtype## ex(##listtype## a, ##listtype## b) {
+    	return a.map(b, (c,d) -> c == n##typeChar## ? n##returnTypeChar## : d == n##typeChar## ? n##returnTypeChar## : ##returnCast## (c % d));
+    }
+    
+    ##FOReachTYPE##	
+}

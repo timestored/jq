@@ -1,0 +1,31 @@
+
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.12'
+	implementation 'com.google.guava:guava:26.0-jre'
+	
+	api 'com.carrotsearch:hppc:0.8.1'
+	api 'io.netty:netty-transport:4.1.4.Final'
+	api 'io.netty:netty-handler:4.1.4.Final'
+}
+ 
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.timestored.jdb.database.Database'
+    }
+}
+
+
+def generatedSources = "$buildDir/generated-src/src/main/java"
+sourceSets.main.java.srcDirs = ["$generatedSources",'src/main/java']
+
+
+task myPrebuildTask(type: Exec) {
+    workingDir "$projectDir/.."
+    commandLine 'java', '-jar', 'genie/build/libs/genie-all.jar', "."
+}
+
+compileJava { dependsOn myPrebuildTask }

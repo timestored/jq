@@ -1,0 +1,16 @@
+package com.timestored.jq.ops.mono;
+import com.timestored.jdb.col.*;
+
+public class $Name$Op extends KRunnerDoubleMapBase {
+	public static $Name$Op INSTANCE = new $Name$Op();
+	@Override public String name() { return "$name$"; }
+	
+    public DoubleCol placeCalcInto(DoubleCol dc) {
+        for(int i=0; i<dc.size(); i++) {
+            if(!Double.isNaN(dc.get(i))) {
+                dc.set(i, $code$);
+            }
+        };
+        return dc;
+    }
+}

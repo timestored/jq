@@ -1,0 +1,46 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.database.SpecialValues;
+import com.timestored.jq.ops.mono.TrimOpBase;
+import com.timestored.jdb.col.*;
+import java.io.IOException;
+
+public class RTrimOp extends TrimOpBase {
+	public static RTrimOp INSTANCE = new RTrimOp();
+	@Override public String name() { return "rtrim"; }
+
+
+    public String ex(String a) {
+    	if(a.length()==0 || a.charAt(a.length()-1) != ' ') {
+    		return a;
+    	}
+    	int i = a.length()-2;
+    	for(;i >= 0; i--) {
+    		if(a.charAt(i) != ' ') {
+    			break;
+    		}
+    	}
+    	return a.substring(0, i+1); 
+    }
+    
+	##FOReachLIST##
+    public ##type## ex(##type## a) {
+    	if(a.size() == 0 || a.get(a.size()-1) != SpecialValues.n##typeChar##) {
+    		return a;
+    	}
+    	int i=a.size()-1;
+    	for(; i >= 0; i--) {
+    		if(a.get(i) != SpecialValues.n##typeChar##) {
+    			break;    			
+    		}
+    	}
+    	try {
+			a.setSize(i+1);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+        return a;
+    }
+	##FOReachLIST##
+    
+}

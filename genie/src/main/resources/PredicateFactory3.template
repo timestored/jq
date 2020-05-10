@@ -1,0 +1,11 @@
+package com.timestored.jdb.predicate;
+
+import com.timestored.jdb.function.*;
+import java.sql.Timestamp;
+import java.sql.Date;
+import com.timestored.jdb.database.*;
+
+public interface PredicateFactory3 {
+	##FOReachTYPE##
+	##Type##Predicate get##Type##Predicate(##type## x, ##type## y, ##type## z);  ##FOReachTYPE##
+}

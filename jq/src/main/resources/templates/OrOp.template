@@ -1,0 +1,38 @@
+package com.timestored.jq.ops; 
+import static com.timestored.jdb.database.SpecialValues.*;
+import com.timestored.jdb.col.*;
+
+import com.timestored.jdb.kexception.LengthException;
+
+
+public class OrOp extends BaseCastingDiadUniform {
+	public static OrOp INSTANCE = new OrOp(); 
+	@Override public String name() { return "or"; }
+
+	/**
+	 * In math operations anything on a null gives a null as it's not known.
+	 **/
+	
+    ##FOReachTYPE##	
+    @Override public ##type## ex(##type## a, ##type## b) { return ##cast## Math.max(a, b); }
+
+    @Override public ##listtype## ex(##type## a, ##listtype## b) {
+        ##listtype## r = new Memory##listtype##(b.size());
+		for(int i=0; i<r.size(); i++) { r.set(i, ##cast## Math.max(a, b.get(i))); };
+        return r;
+    }
+
+    @Override public ##listtype## ex(##listtype## a, ##type## b) { return ex(b,a); }
+
+    @Override public ##listtype## ex(##listtype## a, ##listtype## b) {
+    	if(a.size() != b.size()) {
+    		throw new LengthException();
+    	}
+        ##listtype## r = new Memory##listtype##(b.size());
+        for(int i=0; i<a.size(); i++) {
+            r.set(i, ##cast## Math.max(a.get(i), b.get(i)));
+        }
+        return r;
+    }
+    ##FOReachTYPE##	
+}

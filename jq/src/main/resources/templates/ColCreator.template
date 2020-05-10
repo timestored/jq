@@ -1,0 +1,29 @@
+package com.timestored.jq.ops.mono;
+
+
+import com.timestored.jq.RankException;
+import com.timestored.jdb.col.*;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
+public class ColCreator {
+
+	##FOReachATOM##
+    public static ##listtype## ##typeChar##(int initialSize, Function<Integer,##Type##> f) {
+    	##listtype## r = new Memory##listtype##(initialSize);
+    	for(int i=0; i<initialSize; i++) {
+    		r.set(i, f.apply(i));
+    	}
+    	return r; 
+    }
+    
+    public static ##listtype## ##typeChar##(int initialSize, ##type## constant) {
+    	return ##typeChar##(initialSize, i -> constant); 
+    }
+    
+    
+    public static ##listtype## ##typeChar##() { return new Memory##listtype##(0); }
+	##FOReachATOM##
+
+}

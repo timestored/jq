@@ -1,0 +1,160 @@
+package com.timestored.jq.ops;
+
+
+import com.timestored.jdb.database.SpecialValues;
+import com.timestored.jq.TypeException;
+import com.timestored.jq.ops.mono.CurriedDiadOp;
+import com.timestored.jq.ops.mono.Monad;
+import com.timestored.jq.ops.mono.TypeOp;
+import com.timestored.jq.ops.mono.NiladicOp;
+import com.timestored.jdb.database.CType;
+import com.timestored.jdb.database.*;
+import com.timestored.jdb.database.Time;
+import com.timestored.jdb.kexception.NYIException;
+import com.timestored.jdb.col.*;
+
+
+public class IndexOp extends BaseDiad {
+	public static IndexOp INSTANCE = new IndexOp();
+	@Override public String name() { return "@"; }
+
+    public Object ex(ObjectCol a, final int idx) {
+    	if(idx >= 0 && idx < a.size()) {
+    		return a.get(idx);
+    	} else if(a.size() == 0) {
+    		return ColProvider.emptyCol(CType.OBJECT);
+    	}
+		Object firstObj = a.get(0);
+		short typeNum = TypeOp.TYPE.type(firstObj);
+		CType cType = CType.getType(typeNum);
+		if(typeNum<0) {
+			return cType.getNullValue();
+		} else {
+			return ColProvider.emptyCol(typeNum);
+		}
+    }
+
+    public ObjectCol ex(ObjectCol a, IntegerCol lookup) {
+    	ObjectCol r = new MemoryObjectCol(lookup.size());
+        for(int i=0; i<lookup.size(); i++) {
+            int idx = lookup.get(i);
+            r.set(i, ex(a, idx));
+        }
+        return r;
+    }
+    
+    public Object run(Object a, Object lookup) {
+    	
+    	// 1 "text" => Print to stdout/stderr
+    	int na = a instanceof Integer ? (int) a : a instanceof Long ? ((int) (long) a) : 0;
+    	if(Math.abs(na) == 1 || Math.abs(na) == 2) {
+    		String txt = lookup instanceof CharacterCol ? CastOp.CAST.s((CharacterCol)lookup)
+    				: lookup instanceof Character ? (""+(char) lookup) : null;
+    		if(txt == null) {
+    			throw new TypeException("Standard Streams only accept Strings");
+    		}
+    		txt = txt + (na < 0 ? "" : "\r\n");
+    		if(Math.abs(na) == 1) {
+    			context.stdout(txt);
+    		} else {
+    			context.stderr(txt);
+    		}
+			
+			return a;
+    	}
+
+    	// Running a command
+    	if(a instanceof Op) {
+    		if(a instanceof Diad) {
+    			CurriedDiadOp m = new CurriedDiadOp((Diad) a);
+				m.setLeft(lookup);
+				return m;
+    		} else if(a instanceof Monad) {
+    			Monad m = (Monad) a;
+    			m.setContext(context);
+    			m.setFrame(frame);
+    			return m.run(lookup);
+    		}
+    		throw new NYIException();
+    	}
+    	
+
+    	// Indexing 
+    	
+
+    	if(NiladicOp.INSTANCE.equals(lookup)) {
+    		return a;
+    	}
+    	short sType = (short) Math.abs(TypeOp.TYPE.type(lookup));
+    	if(!(sType == 1 || sType == 5 || sType == 6 || sType == 7 || sType == 0 || sType == 10)) {
+    		throw new TypeException();
+		}
+    	
+    	Object indiceO = CastOp.CAST.run((short) 6, lookup);
+    	if(indiceO instanceof Integer) {
+    		int idx = (int) indiceO;
+
+    		if(a instanceof IntegerCol) {
+    			IntegerCol ica = (IntegerCol) a;
+    			if(ica.getType() != -CType.INTEGER.getTypeNum()) {
+    				int r = ex(ica, idx);
+    				switch(ica.getType()) {
+	    				case 13: return new Month(r);
+	    				case 14: return new Dt(r);
+	    				case 17: return new Minute(r);
+	    				case 18: return new Second(r);
+	    				case 19: return new Time(r);
+    				}
+    				throw new NYIException();
+    			}
+    		} else if(a instanceof LongCol) {
+    			LongCol ica = (LongCol) a;
+    			if(ica.getType() != -CType.LONG.getTypeNum()) {
+    				long r = ex(ica, idx);
+    				switch(ica.getType()) {
+	    				case 16: return new Timespan(r);
+    					case 12: return new Timstamp(r);
+    				}
+    				throw new NYIException();
+    			}
+    		}
+    		
+    		##FOReachTYPE##
+    		if(a instanceof ##listtype##) {  return ex((##listtype##)a, idx);  }  ##FOReachTYPE##
+    		if(a instanceof ObjectCol) {  return ex((ObjectCol)a, idx);  }
+    	} else if(indiceO instanceof IntegerCol) {
+    		IntegerCol indices = (IntegerCol) indiceO;
+    		
+    		if(a instanceof IntegerCol) {
+    			IntegerCol r = ex((IntegerCol)a, indices);
+    			r.setType(((IntegerCol) a).getType());
+    		}  
+    		
+    		##FOReachTYPE##
+    		if(a instanceof ##listtype##) {  return ex((##listtype##)a, indices);  }  ##FOReachTYPE##
+    		if(a instanceof ObjectCol) {  return ex((ObjectCol)a, indices);  }
+    	} else if(lookup instanceof Object[]) {
+    		// TODO
+    	}
+
+        throw new UnsupportedOperationException("bad type combo");
+    }
+
+    ##FOReachATOM##
+    public ##type## ex(##listtype## a, final int idx) {
+        return (idx >= 0 && idx < a.size()) ? a.get(idx) : SpecialValues.n##typeChar##;
+    }
+    ##FOReachATOM##
+    
+    ##FOReachLIST##
+    public ##listtype## ex(##listtype## a, IntegerCol lookup) {
+        ##listtype## r = new Memory##listtype##(lookup.size());
+        for(int i=0; i<lookup.size(); i++) {
+            int idx = lookup.get(i);
+            r.set(i, (idx >= 0 && idx < a.size()) ? a.get(idx) : SpecialValues.n##typeChar##);
+        }
+        return r;
+    }
+    ##FOReachLIST##
+    
+}

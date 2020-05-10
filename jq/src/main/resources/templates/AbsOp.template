@@ -1,0 +1,24 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.col.*;
+
+import java.util.Arrays;
+
+public class AbsOp extends MonadReduceToSameObject {
+	public static AbsOp INSTANCE = new AbsOp();
+	@Override public String name() { return "abs"; }
+
+	##FOReachATOM## 
+    public ##type## ex(##type## a)   { return ##cast## Math.abs(a ##fromCast##) ##toCast##; }  ##FOReachATOM## 
+
+	##FOReachLIST## 
+    public ##type## ex(##type## a) {
+        Memory##type## r = new Memory##type##(a.size());
+        for(int i=0; i<a.size(); i++) {
+            r.set(i, ##cast## Math.abs(a.get(i) ##fromCast##) ##toCast##);
+        }
+        return r;
+    }
+	##FOReachLIST## 
+
+}

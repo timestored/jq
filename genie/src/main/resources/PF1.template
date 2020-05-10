@@ -1,0 +1,21 @@
+package com.timestored.jdb.predicate;
+
+import com.timestored.jdb.function.*;
+import java.sql.Timestamp;
+import java.sql.Date;
+import com.timestored.jdb.database.*;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor class PF1 implements PredicateFactory {
+	
+	private final PredicateFactory1 predicateFactory1;
+	private final ConvertStrategy convertStrategy;
+	private final Object o;
+
+	##FOReachTYPE##
+	@Override public ##Type##Predicate get##Type##Predicate() {
+		return predicateFactory1.get##Type##Predicate(convertStrategy.to##Type##(o));
+	}
+	##FOReachTYPE##
+}

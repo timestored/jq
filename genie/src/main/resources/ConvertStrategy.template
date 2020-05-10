@@ -1,0 +1,10 @@
+package com.timestored.jdb.predicate;
+
+import java.sql.Timestamp;
+import java.sql.Date;
+import com.timestored.jdb.database.*;
+
+interface ConvertStrategy {
+	##FOReachTYPE##
+	##type## to##Type##(Object o);  ##FOReachTYPE##
+}

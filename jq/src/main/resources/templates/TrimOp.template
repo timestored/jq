@@ -1,0 +1,28 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.database.SpecialValues;
+import com.timestored.jq.ops.mono.TrimOpBase;
+import com.timestored.jdb.col.*;
+import com.timestored.jdb.database.CType;
+import com.timestored.jdb.iterator.RangeLocations;
+
+public class TrimOp extends TrimOpBase {
+	public static TrimOp INSTANCE = new TrimOp();
+	@Override public String name() { return "trim"; }
+
+    public String ex(String a) { return a.trim(); }
+    
+	##FOReachLIST##
+    public ##type## ex(##type## a) {
+    	if(a.size() == 0 || (!CType.isNull(a.get(0)) && !CType.isNull(a.get(a.size()-1)))) {
+    		return a;
+    	}
+    	int leftNulls = 0;
+    	for(;leftNulls<a.size() && CType.isNull(a.get(leftNulls)); leftNulls++) {}
+    	int rightNulls = a.size()-1;
+    	for(;rightNulls > leftNulls && CType.isNull(a.get(rightNulls)); rightNulls--) {}
+    	return a.select(new RangeLocations(leftNulls, rightNulls+1));
+    }
+	##FOReachLIST##
+
+}

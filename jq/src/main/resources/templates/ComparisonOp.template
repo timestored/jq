@@ -1,0 +1,30 @@
+package com.timestored.jq.ops; 
+import com.timestored.jdb.col.*;
+
+import com.timestored.jdb.kexception.LengthException;
+public class ComparisonOp extends KRunnerBinOpBase {
+	public static ComparisonOp INSTANCE = new ComparisonOp(); 
+	@Override public String name() { return "%"; }
+	
+	/**
+	 * In comparison operations nulls are not treated special so that operations are consistent for a<b, a>=b..
+	 **/
+	 
+    ##FOReachTYPE##	
+    @Override public ##returntype## ex(##type## a, ##type## b) { return ##returnCast## (a % b); }
+
+    @Override public ##returnlisttype## ex(##type## a, ##listtype## b) {
+    	return ColProvider.b(b.size(), i -> ##returnCast## a % b.get(i));
+    }
+
+    @Override public ##returnlisttype## ex(##listtype## a, ##type## b) {
+    	return ColProvider.b(a.size(), i -> ##returnCast## a.get(i) % b);
+    }
+
+    @Override public ##returnlisttype## ex(##listtype## a, ##listtype## b) {
+    	return ColProvider.b(b.size(), i -> ##returnCast## a.get(i) % b.get(i));
+    }
+    
+    
+    ##FOReachTYPE##	
+}

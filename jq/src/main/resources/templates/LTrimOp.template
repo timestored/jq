@@ -1,0 +1,42 @@
+/** This code was generated using code generator:com.timestored.jq.ops**/
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.database.SpecialValues;
+import com.timestored.jq.ops.mono.TrimOpBase;
+import com.timestored.jdb.col.*;
+import com.timestored.jdb.iterator.RangeLocations;
+
+public class LTrimOp extends TrimOpBase {
+	public static LTrimOp INSTANCE = new LTrimOp();
+	@Override public String name() { return "ltrim"; }
+
+    public String ex(String a) {
+    	if(a.length()==0 || a.charAt(0) != ' ') {
+    		return a;
+    	}
+    	int i = 1;
+    	for(;i < a.length(); i++) {
+    		if(a.charAt(i) != ' ') {
+    			break;
+    		}
+    	}
+    	return a.substring(i); 
+    }
+    
+	
+	##FOReachLIST##
+    public ##type## ex(##type## a) {
+    	if(a.size() == 0 || a.get(0) != SpecialValues.n##typeChar##) {
+    		return a;
+    	}
+    	int i=1;
+    	for(; i<a.size(); i++) {
+    		if(a.get(i) != SpecialValues.n##typeChar##) {
+    			break;    			
+    		}
+    	}
+    	return a.select(new RangeLocations(i, a.size()));
+    }
+	##FOReachLIST##
+    
+}

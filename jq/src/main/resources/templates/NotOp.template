@@ -1,0 +1,22 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jq.TypeException;
+import com.timestored.jdb.col.*;
+import com.timestored.jdb.kexception.NYIException;
+
+public class NotOp extends MonadReduceToObject {
+	public static NotOp INSTANCE = new NotOp();
+	@Override public String name() { return "not"; }
+
+	##FOReachATOM## 
+    public Boolean ex(##type## a)   { return (a ##fromCast##)==0; }  ##FOReachATOM## 
+
+	##FOReachLIST## 
+    public BooleanCol ex(##type## a) {
+    	BooleanCol b = new MemoryBooleanCol(a.size());
+        for(int i=0; i<a.size(); i++) { b.set(i, (a.get(i) ##fromCast##) == 0); };
+        return b;
+    }
+	##FOReachLIST## 
+
+}

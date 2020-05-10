@@ -1,0 +1,28 @@
+package com.timestored.jdb.predicate;
+
+import com.timestored.jdb.function.*;
+import java.sql.Timestamp;
+import java.sql.Date;
+import com.timestored.jdb.database.*;
+
+public class SuperPredicates {
+
+
+	static final PredicateFactory2 between = new PredicateFactory2() {
+		##FOReachTYPE##
+		@Override public ##Type##Predicate get##Type##Predicate(##type## lowerBound, ##type## upperBound) {
+			return ##Type##Predicates.between(lowerBound, upperBound);
+		}
+		##FOReachTYPE##
+	}; 
+	
+
+	##FOReachFUNC##
+	static final PredicateFactory1 ##func## = new PredicateFactory1() {
+		##FOReachTYPE##
+		@Override public ##Type##Predicate get##Type##Predicate(##type## value) {
+			return ##Type##Predicates.##func##(value);
+		}   ##FOReachTYPE##
+	}; 
+    ##FOReachFUNC##
+}

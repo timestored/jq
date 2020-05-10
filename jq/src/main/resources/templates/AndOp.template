@@ -1,0 +1,47 @@
+package com.timestored.jq.ops; 
+import static com.timestored.jdb.database.SpecialValues.*;
+import com.timestored.jdb.col.*;
+
+import com.timestored.jdb.kexception.LengthException;
+
+
+public class AndOp extends BaseCastingDiadUniform {
+	public static AndOp INSTANCE = new AndOp(); 
+	@Override public String name() { return "and"; }
+
+    @Override public boolean ex(boolean a, boolean b) { return  a && b; }
+    @Override public BooleanCol ex(boolean a, BooleanCol b) { return ex(b, a); }
+    @Override public BooleanCol ex(BooleanCol a, boolean b) { 
+    	BooleanCol r = new MemoryBooleanCol(a.size());
+		for(int i=0; i<r.size(); i++) { r.set(i,  b && a.get(i)); };
+        return r;
+    }
+    @Override public BooleanCol ex(BooleanCol a, BooleanCol b) { 
+    	BooleanCol r = new MemoryBooleanCol(a.size());
+		for(int i=0; i<r.size(); i++) { r.set(i,  b.get(i) && a.get(i)); };
+        return r;
+    }
+
+    ##FOReachTYPE##	
+    @Override public ##type## ex(##type## a, ##type## b) { return ##cast## Math.min(a, b); }
+
+    @Override public ##listtype## ex(##type## a, ##listtype## b) {
+        ##listtype## r = new Memory##listtype##(b.size());
+		for(int i=0; i<r.size(); i++) { r.set(i, ##cast## Math.min(a, b.get(i))); };
+        return r;
+    }
+
+    @Override public ##listtype## ex(##listtype## a, ##type## b) { return ex(b,a); }
+
+    @Override public ##listtype## ex(##listtype## a, ##listtype## b) {
+    	if(a.size() != b.size()) {
+    		throw new LengthException();
+    	}
+        ##listtype## r = new Memory##listtype##(b.size());
+        for(int i=0; i<a.size(); i++) {
+            r.set(i, ##cast## Math.min(a.get(i), b.get(i)));
+        }
+        return r;
+    }
+    ##FOReachTYPE##	
+}

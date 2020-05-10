@@ -1,0 +1,36 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jq.RankException;
+import com.timestored.jdb.col.*;
+
+import java.util.Arrays;
+
+public class ReverseOp extends MonadReduceToSameObject {
+	public static ReverseOp INSTANCE = new ReverseOp();
+	@Override public String name() { return "reverse"; }
+
+	@Override public String ex(String a) {  return new StringBuilder(a).reverse().toString(); }
+	@Override public ObjectCol ex(ObjectCol a) { throw new UnsupportedOperationException(); }
+
+	##FOReachATOM##
+	@Override public ##type## ex(##type## a) { return a; }  ##FOReachATOM##
+	
+	##FOReachLIST##
+    public ##listtype## ex(##listtype## a) {
+    	##listtype## r = new Memory##listtype##(a.size());
+    	for(int i=0; i<a.size(); i++) {
+    		r.set(a.size()-i-1, a.get(i));
+    	}
+    	return r; 
+    }
+	##FOReachLIST##
+
+
+    public StringCol ex(StringCol a) {
+    	StringCol r = new MemoryStringCol(a.size());
+    	for(int i=0; i<a.size(); i++) {
+    		r.set(a.size()-i-1, a.get(i));
+    	}
+    	return r; 
+    }
+}

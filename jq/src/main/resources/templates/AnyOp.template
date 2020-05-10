@@ -1,0 +1,19 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.col.*;
+
+public class AnyOp extends MonadReduceToBoolean {
+	public static AnyOp INSTANCE = new AnyOp();
+	@Override public String name() { return "any"; }
+
+	##FOReachATOM## 
+    public boolean ex(##type## a)  { return (a ##fromCast##)>0; }  ##FOReachATOM##
+
+	##FOReachLIST## 
+    public boolean ex(##type## a) {
+        for(int i=0; i<a.size(); i++) { if((a.get(i) ##fromCast##)!=0) { return true; } };
+        return false;
+    }
+	##FOReachLIST## 
+
+}
