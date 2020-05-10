@@ -29,7 +29,7 @@ public class Genie {
 
 	public static void main(String... args) throws IOException {
 		PROJECT_ORIGIN = new File(args[0], "jdb");
-		PROJECT_TARGET = new File(PROJECT_ORIGIN,"build\\generated-src");
+		PROJECT_TARGET = new File(PROJECT_ORIGIN,"build" + File.separator + "generated-src");
 		ColGenie.generate();
 		IteratorGenie.generate();
 		PredicateGenie.generate();

@@ -61,8 +61,8 @@ public class Genie2 {
 	
 	
 	public static void main(String... args) throws IOException {
-		File projectOrigin = new File(args[0], "jq\\src\\main\\resources\\templates");
-		File projectTarget = new File(args[0], "jq\\build\\generated-src\\src\\main\\java\\");
+		File projectOrigin = new File(args[0], "jq\\src\\main\\resources\\templates".replace("\\", File.separator));
+		File projectTarget = new File(args[0], "jq\\build\\generated-src\\src\\main\\java\\".replace("\\", File.separator));
 		Genie2 genDia = new Genie2("com.timestored.jq.ops", projectOrigin, projectTarget);
 		deleteFolder(new File(projectTarget, "com/timestored/jq/ops"));
 		generateDiads(genDia);
