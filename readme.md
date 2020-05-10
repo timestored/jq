@@ -17,6 +17,8 @@ Alternatively, you can run a much slower version online at: (https://www.timesto
 
 ## Building Jq
 
+Video of build and run on linux: https://youtu.be/TEQ-AvLo_HU
+
 ```
  gradle clean build generateGrammarSource shadowJar
  java -jar jq\build\libs\jq-0.0.1-SNAPSHOT-all.jar
