@@ -261,7 +261,7 @@ public class CastOp extends BaseDiad {
 		switch(Math.abs(i.getType())) {
 			case 6: ni = MulOp.INSTANCE.ex(i, 1); break;
 		}
-		ni.setType((short) -CType.DATE.getTypeNum()); 
+		ni.setType((short) -CType.DT.getTypeNum()); 
 		return ni; 
 	}
 	

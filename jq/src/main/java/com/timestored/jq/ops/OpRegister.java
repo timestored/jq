@@ -39,6 +39,8 @@ public class OpRegister {
     
     static {
 		// Monads
+    	reg(NextOp.INSTANCE);
+    	reg(PrevOp.INSTANCE);
     	reg(HopenOp.INSTANCE);
     	reg(HdelOp.INSTANCE);
     	reg(HcountOp.INSTANCE);

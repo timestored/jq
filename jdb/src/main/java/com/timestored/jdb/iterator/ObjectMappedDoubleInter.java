@@ -9,6 +9,7 @@ package com.timestored.jdb.iterator;
 /**TYPE=TIMESPAN import com.timestored.jdb.database.Timespan; **/
 /**TYPE=MONTH import com.timestored.jdb.database.Month; **/
 /**TYPE=TIME import com.timestored.jdb.database.Time; **/
+/**TYPE=DT import com.timestored.jdb.database.Dt; **/
 import com.timestored.jdb.function.ToDoubleFunction;
 
 import lombok.AllArgsConstructor;

@@ -133,7 +133,7 @@ public class Qs1Op extends MonadReduceToObject {
     	switch(cType) {
 			case BYTE:
 			case LONG:
-			case DATE:
+			case DT:
 			case OBJECT:
 			case CHARACTER:
 			case STRING:

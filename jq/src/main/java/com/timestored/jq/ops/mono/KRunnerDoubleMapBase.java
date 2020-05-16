@@ -7,10 +7,13 @@ import com.timestored.jdb.col.DoubleCol;
 import com.timestored.jdb.col.FloatCol;
 import com.timestored.jdb.col.IntegerCol;
 import com.timestored.jdb.col.LongCol;
+import com.timestored.jdb.col.Mapp;
 import com.timestored.jdb.col.MemoryDoubleCol;
 import com.timestored.jdb.col.MemoryObjectCol;
+import com.timestored.jdb.col.MyTbl;
 import com.timestored.jdb.col.ObjectCol;
 import com.timestored.jdb.col.ShortCol;
+import com.timestored.jdb.col.Tbl;
 import com.timestored.jdb.database.CType;
 import com.timestored.jdb.database.Dt;
 import com.timestored.jdb.database.IntegerMappedVal;
@@ -84,15 +87,24 @@ public abstract class KRunnerDoubleMapBase extends BaseMonad {
             return ex((DoubleCol)a);
         } else if(a instanceof CharacterCol) {
             return ex((CharacterCol)a);
+        } else if(a instanceof Tbl) {
+            return mapEach((Tbl)a);
         } else if(a instanceof ObjectCol) {
-            return handleNesting((ObjectCol)a);
+            return mapEach((ObjectCol)a);
+        } else if(a instanceof Mapp) {
+            return mapEach((Mapp)a);
         }
         throw new UnsupportedOperationException("bad type combo");
     }
 
-
-    private ObjectCol handleNesting(ObjectCol o) {
-    	ObjectCol r = new MemoryObjectCol(o.size());
+    public Tbl mapEach(Tbl o) {
+        if(o.size() == 0) { return o; }
+    	return new MyTbl(o.getKey(), mapEach(o.getValue()));
+    }
+    
+    public ObjectCol  mapEach(ObjectCol o) {
+        if(o.size() == 0) { return o; }
+        ObjectCol r = new MemoryObjectCol(o.size());
         for(int i=0; i<r.size(); i++) {
             r.set(i, run(o.get(i)));
         }

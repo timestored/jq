@@ -26,15 +26,15 @@ public class Dt implements IntegerMappedVal {
 	
 	public static int asInt(String dtString) {
 		String t = dtString.trim().toLowerCase();
-		if(t.charAt(4) == '-' && t.charAt(7) == '-') {
-			t = t.replaceAll("-", ".");
-		}
-		switch (dtString) {
+		switch (t) {
 		case "0w": return SpecialValues.wi;
 		case "-0w": return SpecialValues.nwi;
 		case "0n": return SpecialValues.ni;
 		}
 		try {
+			if(t.length() >= 7 && t.charAt(4) == '-' && t.charAt(7) == '-') {
+				t = t.replaceAll("-", ".");
+			}
 			java.sql.Date sqlDate = new java.sql.Date(dtFormat.parse(t).getTime());
 			long l = sqlDate.getTime();
 			if(l == SpecialValues.nj) {
@@ -68,6 +68,6 @@ public class Dt implements IntegerMappedVal {
 
 	@Override public int getInt() { return daysSince2000; }
 
-	@Override public short getType() { return CType.DATE.getTypeNum(); }
+	@Override public short getType() { return CType.DT.getTypeNum(); }
 
 }

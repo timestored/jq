@@ -73,16 +73,6 @@ class DiskColProvider extends ColProvider {
 		@Override public ShortCol createShortCol(String identifier) throws IOException { 
 			return new DiskShortCol(createFile(identifier), HEADER_SZ);
 		} 
-
-		@Override public DateCol createDateCol(String identifier) throws IOException { 
-			return new DiskDateCol(createFile(identifier), HEADER_SZ);
-		} 
-		
-		private class DiskDateCol extends IntegerBackedDateCol {
-			public DiskDateCol(File file, long fileOffset) {
-				super(new DiskIntegerCol(file, fileOffset), ToFromIntDate.INSTANCE);
-			}
-		}
 		
 
 		@Override public StringCol createStringCol(String identifier) throws IOException {

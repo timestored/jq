@@ -32,6 +32,8 @@ public abstract class Monad##Action####ReturnType## extends BaseMonad {
             return ex((Time) o);
         } else if(o instanceof Second) {
             return ex((Second) o);
+        } else if(o instanceof Dt) {
+            return ex((Dt) o);
         } else if(o instanceof Month) {
             return ex((Month) o);
         } else if(o instanceof Timespan) {

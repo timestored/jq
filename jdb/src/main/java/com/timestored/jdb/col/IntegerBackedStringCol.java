@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 import com.timestored.jdb.database.CType;
 import com.timestored.jdb.function.DiadToStringFunction;
 import com.timestored.jdb.function.IntegerPredicate;
-import com.timestored.jdb.function.MonadToDateFunction;
 import com.timestored.jdb.function.MonadToStringFunction;
 import com.timestored.jdb.function.StringPredicate;
 import com.timestored.jdb.iterator.IntegerIter;

@@ -25,7 +25,6 @@ public abstract class ColProvider {
 	public abstract ShortCol createShortCol(String identifier) throws IOException;
 	public abstract CharacterCol createCharacterCol(String identifier) throws IOException;
 	public abstract ObjectCol createObjectCol(String identifier) throws IOException;
-	public abstract DateCol createDateCol(String identifier) throws IOException;
 	
 
 	public static ColProvider getInMemory() {
@@ -49,7 +48,7 @@ public abstract class ColProvider {
 	private static final StringCol emptyStringCol = new MemoryStringCol(0);
 	private static final LongCol emptyTimstampCol = new MemoryLongCol(0);
 	private static final LongCol emptyTimespanCol = new MemoryLongCol(0);
-	private static final DateCol emptyDateCol = new MemoryDateCol(0);
+	private static final IntegerCol emptyDateCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptySecondCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptyMinuteCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptyTimeCol = new MemoryIntegerCol(0);
@@ -60,6 +59,7 @@ public abstract class ColProvider {
 		emptyTimeCol.setType((short) -CType.TIME.getTypeNum());
 		emptyTimstampCol.setType((short) -CType.TIMSTAMP.getTypeNum());
 		emptyTimespanCol.setType((short) -CType.TIMESPAN.getTypeNum());
+		emptyDateCol.setType((short) -CType.DT.getTypeNum());
 		
 		if(Database.QCOMPATIBLE) {
 			emptyBooleanCol.setSorted(false);
@@ -130,7 +130,6 @@ public abstract class ColProvider {
 		public ByteCol createByteCol(String identifier) { return new MemoryByteCol(); } 
 		public ShortCol createShortCol(String identifier) { return new MemoryShortCol(); } 
 		public CharacterCol createCharacterCol(String identifier) { return new MemoryCharacterCol(); } 
-		public DateCol createDateCol(String identifier) { return new MemoryDateCol(5); } 
 	}
 
 	public static MemoryStringCol toStringCol(Collection<String> ls) {
@@ -163,7 +162,6 @@ public abstract class ColProvider {
 		case BOOLEAN:	return new MemoryBooleanCol(initialSize);
 		case BYTE:	return new MemoryByteCol(initialSize);
 		case CHARACTER:	return new MemoryCharacterCol(initialSize);
-		case DATE:	return new MemoryDateCol(initialSize);
 		case DOUBLE:	return new MemoryDoubleCol(initialSize);
 		case FLOAT:	return new MemoryFloatCol(initialSize);
 		case INTEGER:	return new MemoryIntegerCol(initialSize);
@@ -171,6 +169,7 @@ public abstract class ColProvider {
 		case SHORT:	return new MemoryShortCol(initialSize);
 		case STRING:	return new MemoryStringCol(initialSize);
 		case TIME:	return new MemoryIntegerCol(initialSize);
+		case DT:
 		case MINUTE:	
 		case OBJECT:	
 		case SECOND:		

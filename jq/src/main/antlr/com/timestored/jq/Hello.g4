@@ -87,6 +87,7 @@ MONOP:('til'|'enlist'|'first'|'last'|'distinct'|'count'|'key'|'where'|'reverse'|
     |'rand'|'ratios'|'ratios'|'signum'|'value'
     |'trim'|'rtrim'|'ltrim'|'upper'|'lower'|'string'
     |'hcount'|'hdel'|'hsym'|'hopen'|'hclose'
+    |'next'|'prev'
     |'gtime'|'ltime'|'parse'|'views'|'tables'); // exotic
 fragment Adverbs:('each'|'\\:'|'/:'|'\':'|'/'|'\\'|'peach');
 BINOP:(':'|'<'|'>'|'<='|'>='|'&'|'|'|'~'|'?'|'='|'<>'|'+:'|'!'|'*:'|'^'|'+'|'-'|'*'|'%'|'@'|'and'|'or'|'set'|'mod'

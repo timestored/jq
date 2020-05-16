@@ -50,7 +50,7 @@ public class IpcDataWriter implements DataReader {
 	@Override public void visit(double doubleVal) throws IOException {
 		stream.writeByte(-9); stream.writeDouble(doubleVal);	}
 	@Override public void visit(Date date) throws IOException {
-		stream.writeByte(CType.DATE.getTypeNum()); stream.writeLong(ToFromIntDate.INSTANCE.applyAsInt(date));
+		stream.writeByte(CType.DT.getTypeNum()); stream.writeLong(ToFromIntDate.INSTANCE.applyAsInt(date));
 	}
 
 	@Override public void visit(Mapp mapp) throws IOException {
@@ -308,21 +308,6 @@ public class IpcDataWriter implements DataReader {
     	while(it.hasNext()) {
     		stream.writeFloat(it.nextFloat());
     	}	
-	}
-
-	@Override public void visit(DateCol c) throws IOException {
-		writeHead(c.size(), c.getType());
-		if(c instanceof IntegerBackedDateCol) {
-			IntegerIter it = ((IntegerBackedDateCol)c).getC().select();
-	    	while(it.hasNext()) {
-	    		stream.writeInt(it.nextInteger());
-	    	}	
-		} else {
-			DateIter it = c.select();
-	    	while(it.hasNext()) {
-	    		stream.writeInt(ToFromIntDate.INSTANCE.applyAsInt(it.nextDate()));
-	    	}
-		}
 	}
 
 	@Override public void visit(ObjectCol mixedList) throws IOException {

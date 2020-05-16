@@ -13,6 +13,7 @@ import java.io.IOException;
 import com.timestored.jdb.database.CType;
 import com.timestored.jdb.function.DiadToDoubleFunction;
 import com.timestored.jdb.function.DoublePredicate;
+import com.timestored.jdb.database.Dt;
 import com.timestored.jdb.function.MonadToDoubleFunction;
 import com.timestored.jdb.iterator.DoubleIter;
 import com.timestored.jdb.iterator.Locations;

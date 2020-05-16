@@ -28,13 +28,15 @@ public class Genie {
 	@Getter private String packageName;
 
 	public static void main(String... args) throws IOException {
-		PROJECT_ORIGIN = new File(args[0], "jdb");
-		PROJECT_TARGET = new File(PROJECT_ORIGIN,"build" + File.separator + "generated-src");
+		if(args.length > 0) {
+			PROJECT_ORIGIN = new File(args[0], "jdb");
+			PROJECT_TARGET = new File(PROJECT_ORIGIN,"build" + File.separator + "generated-src");
+		}
 		ColGenie.generate();
 		IteratorGenie.generate();
 		PredicateGenie.generate();
 		FunctionGenie.generate();
-		Genie2.main(args);
+		Genie2.main(new File(PROJECT_ORIGIN, "..").getAbsolutePath());
 	}
 
 	

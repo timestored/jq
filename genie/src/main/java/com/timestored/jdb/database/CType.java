@@ -43,7 +43,7 @@ public enum CType implements CTypeI {
 			'p', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
 	MONTH((short)-13, (short)4, "Month", "Month", Month.class, java.sql.Types.TIMESTAMP_WITH_TIMEZONE,
 			'm', new Integer(ni), new Integer(wi), new Integer(nwi)),
-	DATE((short)-14, (short)4, "Date", "Date", java.sql.Date.class, java.sql.Types.DATE,
+	DT((short)-14, (short)4, "Dt", "Dt", Dt.class, java.sql.Types.DATE,
 			'd', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
 	TIMESPAN((short)-16, (short)8, "Timespan", "Timespan", Timespan.class, java.sql.Types.TIME_WITH_TIMEZONE, // WRONG
 			'n', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
@@ -219,6 +219,7 @@ public enum CType implements CTypeI {
 	public String getQName() {
 		String n = this.name();
 		switch(n){
+			case "DT": return "date";
 			case "FLOAT": return "real";
 			case "DOUBLE": return "float";
 			case "CHARACTER": return "char";

@@ -18,7 +18,6 @@ import com.timestored.jdb.col.MemoryBooleanCol;
 import com.timestored.jdb.col.MemoryByteCol;
 import com.timestored.jdb.col.MemoryCharacterCol;
 import com.timestored.jdb.col.MemoryObjectCol;
-import com.timestored.jdb.col.MemoryDateCol;
 import com.timestored.jdb.col.MemoryDoubleCol;
 import com.timestored.jdb.col.MemoryFloatCol;
 import com.timestored.jdb.col.MemoryIntegerCol;
@@ -162,11 +161,6 @@ public class IpcDataReader {
 				MemoryStringCol c = new MemoryStringCol(sz);	
 				l(sz, c);
 				for(int i=0; i<sz; i++) { c.set(i, readString(in)); }
-				return c; }
-			case 14: {
-				MemoryDateCol c = new MemoryDateCol(sz);	
-				l(sz, c);
-				for(int i=0; i<sz; i++) { c.set(i, in.readInt()); }
 				return c; }
 			default: {
 				throw new UnsupportedOperationException("List type not supported:" + typeNum);

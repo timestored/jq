@@ -35,7 +35,7 @@ public class IteratorGenie {
 		// cant create a range of strings :S
 		for(String fn : new String[] { "StringIter" }) {
 			saveTransform(CType.STRING, Lists.newArrayList(CType.MAPP,CType.OBJECT,CType.MINUTE,CType.SECOND,CType.TIME,
-					CType.MONTH,CType.TIMESPAN,CType.TIMSTAMP), fn);
+					CType.MONTH,CType.TIMESPAN,CType.TIMSTAMP,CType.DT), fn);
 		}
 	}
 

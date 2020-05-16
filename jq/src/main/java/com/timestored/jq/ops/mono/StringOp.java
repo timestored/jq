@@ -180,7 +180,7 @@ public class StringOp extends MonadReduceToObject {
     	case MINUTE: return mapEachOne(a, o -> ex((Minute)o));
     	case SECOND: return mapEachOne(a, o -> ex((Second)o));
     	case TIME: return mapEachOne(a, o -> ex((Time)o));
-    	case DATE: return mapEachOne(a, o -> ex((Dt)o));  
+    	case DT: return mapEachOne(a, o -> ex((Dt)o));  
     	}
     	return mapEachOne(a, o -> ex((int) (Integer)o)); 
     }
