@@ -27,3 +27,6 @@ bin
 .gradle
 .classpath
 .project
+
+# Intellij files
+.idea
