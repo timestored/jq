@@ -13,15 +13,21 @@ test {
 	}
 	ignoreFailures = true
 }
-	
+
+repositories {
+	mavenCentral()
+	jcenter()
+	mavenLocal()
+}
+
 subprojects {
 	apply plugin: 'io.franzbecker.gradle-lombok'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'java-library'
-	
+
     group = 'com.timestored.jdb'
     // version = '1.0'
-	
+
 	dependencies {
 		compile 'org.slf4j:slf4j-api:1.7.12'
 		compile 'com.google.guava:guava:26.0-jre'
@@ -33,7 +39,7 @@ subprojects {
 		testCompile('junit:junit:4.13')
 		testImplementation('org.hamcrest:hamcrest-library:2.2')
 	}
-	
+
 	test {
 		useJUnitPlatform {
 			excludeTags 'slow'
