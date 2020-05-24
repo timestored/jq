@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.google.common.base.Preconditions;
 import com.google.common.net.InetAddresses;
@@ -87,23 +88,34 @@ public class HelloRunner extends HelloBaseVisitor<Object> {
 	}
 	
 	@Override public Object visitQuery(QueryContext ctx) {
-		String tblName = ctx.tbl.getText();
-		
-		// Check table and setup the context
-		Object tblO = env.get(tblName);
-		if(tblO == null) {
-			throw new IdNotFoundException(tblName);
+		Frame originalFrame = env;
+		try {
+			String tblName = ctx.tbl.getText();
+			
+			// Check table and setup the context
+			Object tblO = env.get(tblName);
+			if(tblO == null) {
+				throw new IdNotFoundException(tblName);
+			}
+			if(!(tblO instanceof Tbl)) {
+				throw new TypeException("You can only select from a table");
+			}
+			Tbl tbl = (Tbl) tblO;
+			Frame tf = new TableFrame(tbl, env);
+			this.env = tf;
+			
+			// Eval the other args
+			if(ctx.wc != null) {
+				List<ParseTree> wcs = ctx.wc.children;
+				for(ParseTree pt : wcs) {
+					System.out.println(pt.toString());
+				}
+			}
+
+			return tbl;
+		} finally {
+			this.env = originalFrame;
 		}
-		if(!(tblO instanceof Tbl)) {
-			throw new TypeException("You can only select from a table");
-		}
-		Tbl tbl = (Tbl) tblO;
-		Frame tf = new TableFrame(tbl, env);
-		this.env = tf;
-		
-		// Eval the other args
-		
-		return tbl;
 	}
 
 	@Override
@@ -251,6 +263,7 @@ public class HelloRunner extends HelloBaseVisitor<Object> {
 		case ".z.D": return Dt.fromLocalDate(LocalDate.from(Instant.now().atZone(ZoneId.systemDefault())));
 		case ".z.quote": return ColProvider.toCharacterCol(Quotes.getQuote());
 		case ".z.ops": return OpRegister.getSupportedOperations();
+		case ".z.handles": return context.getHandleDetails();
 		
 		default:
 		}

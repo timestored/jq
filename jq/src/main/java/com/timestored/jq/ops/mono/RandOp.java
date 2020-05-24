@@ -14,9 +14,20 @@ import com.timestored.jdb.col.StringCol;
 import com.timestored.jdb.database.DomainException;
 import com.timestored.jq.ops.CastOp;
 
+import lombok.Setter;
+
 public class RandOp extends MonadReduceToObject {
 	public static final RandOp INSTANCE = new RandOp();
 //	private static final Random r = new Random();
+	@Setter private boolean debug = false;
+	
+	@Override public Object run(Object o) {
+		if(debug) {
+			return 1;
+		}
+		return super.run(o);
+	}
+	
 	@Override public String name() { return "rand"; }
 	
 	private ThreadLocalRandom r() { return ThreadLocalRandom.current(); }
@@ -60,4 +71,5 @@ public class RandOp extends MonadReduceToObject {
 	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
 	      .toString();
 	}
+
 }

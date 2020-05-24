@@ -11,6 +11,10 @@ import com.timestored.jdb.database.CType;
 import com.timestored.jdb.database.*;
 import com.timestored.jdb.database.Time;
 import com.timestored.jdb.kexception.NYIException;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 import com.timestored.jdb.col.*;
 
 
@@ -47,19 +51,32 @@ public class IndexOp extends BaseDiad {
     	
     	// 1 "text" => Print to stdout/stderr
     	int na = a instanceof Integer ? (int) a : a instanceof Long ? ((int) (long) a) : 0;
-    	if(Math.abs(na) == 1 || Math.abs(na) == 2) {
-    		String txt = lookup instanceof CharacterCol ? CastOp.CAST.s((CharacterCol)lookup)
-    				: lookup instanceof Character ? (""+(char) lookup) : null;
-    		if(txt == null) {
-    			throw new TypeException("Standard Streams only accept Strings");
-    		}
-    		txt = txt + (na < 0 ? "" : "\r\n");
-    		if(Math.abs(na) == 1) {
-    			context.stdout(txt);
-    		} else {
-    			context.stderr(txt);
-    		}
-			
+    	if(na != 0) {
+	    	if(Math.abs(na) == 1 || Math.abs(na) == 2) {
+	    		String txt = lookup instanceof CharacterCol ? CastOp.CAST.s((CharacterCol)lookup)
+	    				: lookup instanceof Character ? (""+(char) lookup) : null;
+	    		if(txt == null) {
+	    			throw new TypeException("Standard Streams only accept Strings");
+	    		}
+	    		txt = txt + (na < 0 ? "\r\n" : "");
+	    		if(Math.abs(na) == 1) {
+	    			context.stdout(txt);
+	    		} else {
+	    			context.stderr(txt);
+	    		}
+	    	} else {
+	    		OutputStream os = context.getOutputStream(Math.abs(na));
+	    		if(lookup instanceof CharacterCol) {
+	    			String s = CastOp.CAST.s((CharacterCol)lookup) + (na < 0 ? "\r\n" : "");
+	    			try {
+						os.write(s.getBytes());
+						os.flush();
+					} catch (IOException e) {
+						throw new DomainException(e);
+					}
+	    		}
+	    		// @TODO Else -9!/-8! to that pipe
+	    	}
 			return a;
     	}
 

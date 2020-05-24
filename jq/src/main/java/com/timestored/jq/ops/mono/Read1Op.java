@@ -2,23 +2,20 @@ package com.timestored.jq.ops.mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
-import com.timestored.jdb.col.ColProvider;
+import com.timestored.jdb.col.MemoryByteCol;
 import com.timestored.jdb.kexception.OsException;
 import com.timestored.jq.TypeException;
 
-public class Read0Op extends BaseMonad {
-	public static Read0Op INSTANCE = new Read0Op();
-	@Override public String name() { return "read0"; }
+public class Read1Op extends BaseMonad {
+	public static Read1Op INSTANCE = new Read1Op();
+	@Override public String name() { return "read1"; }
 
     public Object run(Object o) {
     	try {
 	    	if(o instanceof String) {
-	    		Path p = HopenOp.toRegularFilePath((String) o);
-	    		List<String> a = Files.readAllLines(p);
-	    		return ColProvider.toCharacterCol(a);
+	    		byte[] vals = Files.readAllBytes(HopenOp.toRegularFilePath((String) o));
+	    		return new MemoryByteCol(vals);
 	    	}
     	} catch(IOException e) {
         	throw new OsException(e);

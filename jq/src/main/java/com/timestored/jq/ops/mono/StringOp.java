@@ -167,7 +167,7 @@ public class StringOp extends MonadReduceToObject {
 
 
     @Override public ObjectCol ex(ByteCol a) { return mapEachOne(a, o -> ex((byte) (Byte)o)); }
-    @Override public String ex(byte a)   {  return String.format("%02X", a); }
+    @Override public String ex(byte a)   {  return String.format("%02X", a).toLowerCase(); }
 	 
     @Override public ObjectCol ex(ShortCol a)  { return mapEachOne(a, o -> ex((short) (Short)o)); }
     @Override public ObjectCol ex(FloatCol a)  { return mapEachOne(a, o -> ex((float) (Float)o)); }

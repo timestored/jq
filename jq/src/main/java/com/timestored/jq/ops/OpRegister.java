@@ -42,9 +42,11 @@ public class OpRegister {
     	reg(NextOp.INSTANCE);
     	reg(PrevOp.INSTANCE);
     	reg(HopenOp.INSTANCE);
+    	reg(HcloseOp.INSTANCE);
     	reg(HdelOp.INSTANCE);
     	reg(HcountOp.INSTANCE);
     	reg(Read0Op.INSTANCE);
+    	reg(Read1Op.INSTANCE);
     	reg(FlipOp.INSTANCE);
     	reg(RandOp.INSTANCE);
     	reg(ShowOp.INSTANCE);

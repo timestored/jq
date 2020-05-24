@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import com.timestored.jdb.database.Database;
 import com.timestored.jdb.database.DomainException;
+import com.timestored.jdb.kexception.OsException;
 import com.timestored.jq.TypeException;
 
 public class HdelOp extends BaseMonad {
@@ -20,7 +21,7 @@ public class HdelOp extends BaseMonad {
 	    		return o;
 	    	}
     	} catch(IOException e) {
-        	throw new DomainException(e);
+        	throw new OsException(e);
     	}
     	if(Database.QCOMPATIBLE) {
         	return NotOp.INSTANCE.run(o);	
