@@ -2,14 +2,18 @@ package com.timestored.jdb.col;
 
 import java.io.IOException;
 import com.timestored.jdb.database.Database;
-
+import com.timestored.jdb.database.SpecialValues;
 import com.carrotsearch.hppc.IntArrayList;
 import com.google.common.base.Preconditions;
 import com.timestored.jdb.database.DataReader;
 import com.timestored.jdb.database.CType;
 import com.timestored.jdb.database.Consts;
+import com.timestored.jdb.function.BooleanPairPredicate;
+import com.timestored.jdb.function.DiadToBooleanFunction;
 import com.timestored.jdb.function.DiadToDoubleFunction;
+import com.timestored.jdb.function.DoublePairPredicate;
 import com.timestored.jdb.function.DoublePredicate;
+import com.timestored.jdb.function.MonadToBooleanFunction;
 import com.timestored.jdb.function.MonadToDoubleFunction;
 import com.timestored.jdb.iterator.ColDoubleIter;
 import com.timestored.jdb.iterator.DoubleIter;
@@ -24,6 +28,7 @@ import com.timestored.jdb.predicate.DoublePredicates.GreaterThanOrEqualDoublePre
 import com.timestored.jdb.predicate.DoublePredicates.InDoublePredicate;
 import com.timestored.jdb.predicate.DoublePredicates.LessThanDoublePredicate;
 import com.timestored.jdb.predicate.DoublePredicates.LessThanOrEqualDoublePredicate;
+import com.timestored.jdb.predicate.ShortPredicates.EqualsShortPredicate;
 import com.timestored.jdb.predicate.PredicateFactory;
 
 import lombok.Getter;
@@ -296,8 +301,9 @@ abstract class BaseDoubleCol implements DoubleCol {
 	@Override public IntegerCol find(DoubleCol needle) {
 		MemoryIntegerCol ic = new MemoryIntegerCol(needle.size());
 		DoubleIter it = needle.select();
+		int ni = 0;
 		while(it.hasNext()) {
-			ic.add(find(it.nextDouble()));
+			ic.set(ni++, find(it.nextDouble()));
 		}
 		return ic;
 	}
@@ -314,7 +320,7 @@ abstract class BaseDoubleCol implements DoubleCol {
 			DoubleIter it = select();
 			while(it.hasNext()) {
 				double n = it.nextDouble();
-				if(n > max && n!=Consts.Nulls.DOUBLE) {
+				if(n > max && !SpecialValues.isNull(n)) {
 					max = n;
 				}
 			}
@@ -331,7 +337,7 @@ abstract class BaseDoubleCol implements DoubleCol {
 			DoubleIter it = select();
 			while(it.hasNext()) {
 				double n = it.nextDouble();
-				if(n < min && n!=Consts.Nulls.DOUBLE) {
+				if(n < min && !SpecialValues.isNull(n)) {
 					min = n;
 				}
 			}
@@ -389,22 +395,90 @@ abstract class BaseDoubleCol implements DoubleCol {
 	}
 	
 	@Override public DoubleCol map(MonadToDoubleFunction f) {
-		MemoryDoubleCol dc = new MemoryDoubleCol(this.size());
-		for(int i=0; i<size(); i++) {
-			dc.set(i, f.map(get(i)));
-		}
-		return dc;
+		return new ProjectedDoubleCol(size(), getType(), i -> f.map(get(i)));
 	}
 	
 	@Override public DoubleCol map(DoubleCol b, DiadToDoubleFunction f) {
     	if(size() != b.size()) {
     		throw new LengthException();
     	}
+		return new ProjectedDoubleCol(size(), getType(), i -> f.map(get(i), b.get(i)));
+	}
+
+	@Override public double over(DiadToDoubleFunction f) {
+		if(this.size() == 0) {
+			return 0;
+		}
+		return over(get(0), f);
+	}
+	
+	@Override public double over(double initVal, DiadToDoubleFunction f) {
+		double r = initVal;
+		for(int i=0; i<size(); i++) {
+			r = f.map(r, get(i));
+		}
+		return r;
+	}
+	
+
+	@Override public DoubleCol scan(DiadToDoubleFunction f) {
+		if(this.size() == 0) {
+			return (DoubleCol) ColProvider.emptyCol(getType());
+		}
+		return scan(get(0), f);
+	}
+	
+	@Override public DoubleCol scan(double initVal, DiadToDoubleFunction f) {
+		if(this.size() == 0) {
+			return (DoubleCol) ColProvider.emptyCol(getType());
+		}
+		double r = initVal;
 		MemoryDoubleCol dc = new MemoryDoubleCol(this.size());
 		for(int i=0; i<size(); i++) {
-			dc.set(i, f.map(get(i), b.get(i)));
+			r = f.map(r, get(i));
+			dc.set(i, r);
 		}
+		dc.setType(getType());
 		return dc;
+	}
+
+	@Override public DoubleCol eachPrior(DiadToDoubleFunction f) {
+		if(this.size() == 0) {
+			return (DoubleCol) ColProvider.emptyCol(getType());
+		}
+		return eachPrior(get(0), f);
+	}
+	
+	@Override public DoubleCol eachPrior(double initVal, DiadToDoubleFunction f) {
+		if(this.size() == 0) {
+			return (DoubleCol) ColProvider.emptyCol(getType());
+		}
+		MemoryDoubleCol dc = new MemoryDoubleCol(this.size());
+		dc.set(0, initVal);
+		for(int i=1; i<size(); i++) {
+			double r = f.map(get(i-1), get(i));
+			dc.set(i, r);
+		}
+		dc.setType(getType());
+		return dc;
+	}
+	
+	@Override public BooleanCol eachPrior(boolean initVal, DoublePairPredicate f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		MemoryBooleanCol dc = new MemoryBooleanCol(this.size());
+		dc.set(0, initVal);
+		for(int i=1; i<size(); i++) {
+			boolean r = f.test(get(i-1), get(i));
+			dc.set(i, r);
+		}
+		dc.setType(getType());
+		return dc;
+	}
+	
+	@Override public DoubleCol each(MonadToDoubleFunction f) {
+		return new ProjectedDoubleCol(this.size(), this.type, i -> f.map(get(i)));
 	}
 	
 	@Override public void setType(short type) {

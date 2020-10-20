@@ -43,9 +43,12 @@ public class SpecialValues {
 	public static final Time nt = new Time(SpecialValues.ni);
 
     public static boolean isNull(boolean a) { return false; }
+    public static boolean isNull(byte a) { return false; }
     public static boolean isNull(short a) { return a == nh; }
     public static boolean isNull(int a) { return a == ni; }
+    public static boolean isNull(char a) { return a == ' '; }
     public static boolean isNull(long a) { return a == nj; }
     public static boolean isNull(float a) { return Float.isNaN(a); }
     public static boolean isNull(double a) { return Double.isNaN(a); }
+	public static boolean isNull(String a) { return a.length() == 0; }
 }

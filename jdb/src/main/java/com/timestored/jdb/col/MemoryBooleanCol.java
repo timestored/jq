@@ -5,10 +5,14 @@ import java.util.Arrays;
 
 import com.google.common.base.Preconditions;
 import com.timestored.jdb.database.Consts;
+import com.timestored.jdb.function.BooleanPairPredicate;
 import com.timestored.jdb.function.BooleanPredicate;
 import com.timestored.jdb.function.DiadToBooleanFunction;
+import com.timestored.jdb.function.DiadToDoubleFunction;
 import com.timestored.jdb.function.MonadToBooleanFunction;
 import com.timestored.jdb.iterator.BooleanIter;
+import com.timestored.jdb.iterator.ColBooleanIter;
+import com.timestored.jdb.iterator.ColDoubleIter;
 import com.timestored.jdb.iterator.DoubleIter;
 import com.timestored.jdb.iterator.Locations;
 import com.timestored.jdb.kexception.SortException;
@@ -109,6 +113,10 @@ public class MemoryBooleanCol implements BooleanCol {
 		}
 		return bc;	
 	}
+	
+	@Override public IntegerCol iasc() {
+		return new MemoryIntegerCol(ArrayUtils.iasc(v));
+	}
 
 	@Override
 	public Locations select(Locations locations, PredicateFactory predicateFactory) {
@@ -121,7 +129,8 @@ public class MemoryBooleanCol implements BooleanCol {
 
 	@Override
 	public BooleanIter select() {
-		throw new UnsupportedOperationException();	}
+		Locations locations = Locations.upTo(this.size());
+		return new ColBooleanIter(this, locations);	}
 
 	@Override public BooleanCol select(Locations locations) {
 		MemoryBooleanCol dc = new MemoryBooleanCol(locations.size());
@@ -178,14 +187,31 @@ public class MemoryBooleanCol implements BooleanCol {
 	public boolean contains(boolean needle) {
 		throw new UnsupportedOperationException();	}
 
-	@Override
-	public IntegerCol find(BooleanCol needle) {
-		throw new UnsupportedOperationException();	}
 
-	@Override
-	public int find(boolean needle) {
-		throw new UnsupportedOperationException();	}
+	@Override public IntegerCol find(BooleanCol needle) {
+		MemoryIntegerCol ic = new MemoryIntegerCol(needle.size());
+		BooleanIter it = needle.select();
+		int ni = 0;
+		while(it.hasNext()) {
+			ic.set(ni++, find(it.nextBoolean()));
+		}
+		return ic;
+	}
 
+	@Override public int find(boolean needle) { return scanFind(needle); }
+
+	int scanFind(boolean needle) {
+		BooleanIter it = select();
+    	int i = 0;
+    	while(it.hasNext()) {
+    		if(needle == it.nextBoolean()) {
+    			return i;
+    		}
+    		i++;
+    	}
+		return i;
+	}	
+	
 	@Override
 	public int bin(boolean val) {
 		throw new UnsupportedOperationException();	}
@@ -252,5 +278,83 @@ public class MemoryBooleanCol implements BooleanCol {
 			dc.set(i, f.map(get(i), b.get(i)));
 		}
 		return dc;
+	}
+	
+
+	@Override public boolean over(DiadToBooleanFunction f) {
+		if(this.size() == 0) {
+			return false;
+		}
+		return over(get(0), f);
+	}
+	
+	@Override public boolean over(boolean initVal, DiadToBooleanFunction f) {
+		boolean r = initVal;
+		for(int i=0; i<size(); i++) {
+			r = f.map(r, get(i));
+		}
+		return r;
+	}
+
+	@Override public BooleanCol scan(DiadToBooleanFunction f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		return scan(get(0), f);
+	}
+	
+	@Override public BooleanCol scan(boolean initVal, DiadToBooleanFunction f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		boolean r = initVal;
+		MemoryBooleanCol dc = new MemoryBooleanCol(this.size());
+		dc.set(0, r);
+		for(int i=1; i<size(); i++) {
+			r = f.map(r, get(i));
+			dc.set(i, r);
+		}
+		return dc;
+	}
+	
+
+
+	@Override public BooleanCol eachPrior(DiadToBooleanFunction f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		return eachPrior(get(0), f);
+	}
+	
+	@Override public BooleanCol eachPrior(boolean initVal, DiadToBooleanFunction f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		MemoryBooleanCol dc = new MemoryBooleanCol(this.size());
+		dc.set(0, initVal);
+		for(int i=1; i<size(); i++) {
+			boolean r = f.map(get(i-1), get(i));
+			dc.set(i, r);
+		}
+		dc.setType(getType());
+		return dc;
+	}
+	
+	@Override public BooleanCol eachPrior(boolean initVal, BooleanPairPredicate f) {
+		if(this.size() == 0) {
+			return (BooleanCol) ColProvider.emptyCol(getType());
+		}
+		MemoryBooleanCol dc = new MemoryBooleanCol(this.size());
+		dc.set(0, initVal);
+		for(int i=1; i<size(); i++) {
+			boolean r = f.test(get(i-1), get(i));
+			dc.set(i, r);
+		}
+		dc.setType(getType());
+		return dc;
+	}
+	
+	@Override public BooleanCol each(MonadToBooleanFunction f) {
+		return ColProvider.b(this.size, i -> f.map(get(i)));
 	}
 }

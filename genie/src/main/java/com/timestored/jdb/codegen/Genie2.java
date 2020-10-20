@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,11 +15,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.google.common.primitives.Ints;
 import com.timestored.jdb.database.CType;
+import static com.timestored.jdb.database.CType.*;
 import com.timestored.jdb.database.CTypeI;
-import com.timestored.jdb.database.IntegerMappedVal;
 
 import lombok.Getter;
 
@@ -61,8 +62,8 @@ public class Genie2 {
 	
 	
 	public static void main(String... args) throws IOException {
-		File projectOrigin = new File(args[0], "jq\\src\\main\\resources\\templates".replace("\\", File.separator));
-		File projectTarget = new File(args[0], "jq\\build\\generated-src\\src\\main\\java\\".replace("\\", File.separator));
+		File projectOrigin = new File(args[0], "jqi\\src\\main\\resources\\templates".replace("\\", File.separator));
+		File projectTarget = new File(args[0], "jqi\\build\\generated-src\\src\\main\\java\\".replace("\\", File.separator));
 		Genie2 genDia = new Genie2("com.timestored.jq.ops", projectOrigin, projectTarget);
 		deleteFolder(new File(projectTarget, "com/timestored/jq/ops"));
 		generateDiads(genDia);
@@ -71,21 +72,26 @@ public class Genie2 {
         
 	}
 
+	
 	private static void generateDiads(Genie2 g2) throws IOException {
-		Template diadTempl = new Template(Collections.emptyMap(), getPairReplacements(p -> p.a.getTypeNum() > p.b.getTypeNum()));
+		List<CTypeI> diadTypes = Arrays.asList(BOOLEAN, SHORT, INTEGER, LONG, FLOAT, DOUBLE, CHARACTER, BYTE, STRING);
+		Template diadTempl = new Template(Collections.emptyMap(), getPairReplacements(diadTypes, p -> p.a.getTypeNum() > p.b.getTypeNum()));
 		String tempName = "DiadXXX.template";
 		String src = g2.readFile(tempName);
 		String uniSrc = src.replace("##Action##", "Uniform").replace("##returntype##", "##type##").replace("##returnlisttype##", "##listtype##");
 		// Horrible hack to change return type for time types dynamically
 		uniSrc = uniSrc.replace("return ex(imvA.getInt(), ((IntegerMappedVal)b).getInt());", "int ri = ex(imvA.getInt(), ((IntegerMappedVal)b).getInt()); return CastOp.CAST.run(imvA.getType(), ri);");
 		uniSrc = uniSrc.replace("return ex(imvA.getLong(), ((LongMappedVal)b).getLong());", "long rj = ex(imvA.getLong(), ((LongMappedVal)b).getLong()); return CastOp.CAST.run(imvA.getType(), rj);");
-		g2.writeFile("BaseDiadUniform.java", diadTempl.apply(uniSrc));
+		String bdu = diadTempl.apply(uniSrc).replace("public abstract BooleanCol ex", "public abstract Col ex")
+				.replace("public abstract boolean ex", "public abstract Object ex")
+				.replace("public abstract byte ex", "public abstract Object ex")
+				.replace("public abstract ByteCol ex", "public abstract Col ex");
+		g2.writeFile("BaseDiadUniform.java", bdu);
 		String booleSrc = src.replace("##Action##", "UniformBoolean").replace("##returntype##", "boolean").replace("##returnlisttype##", "BooleanCol");;
 		g2.writeFile("BaseDiadUniformBoolean.java", diadTempl.apply(booleSrc));
 		
 		// Generate Math Ops
-		List<CTypeI> mathOpTypes = CType.NUMERIC_TYPES.stream().filter(dt -> !dt.equals(CType.BOOLEAN)).collect(Collectors.toList());
-		Template mathOpTempl = getTemplate(mathOpTypes);
+		Template mathOpTempl = getTemplate(Arrays.asList(SHORT, INTEGER, LONG, FLOAT, DOUBLE));
 		
 		// And OrOp
 		g2.writeFile("FillOp.java", mathOpTempl.apply(g2.readFile("FillOp.template")));	
@@ -97,7 +103,7 @@ public class Genie2 {
 		mathOpSrc = mathOpSrc.replace("##returntype##", "##type##").replace("##returnTypeChar##", "##typeChar##").replace("##returnCast##", "##cast##");
 		String moSt = mathOpTempl.apply(mathOpSrc);
 		String[] ops = new String[] { "*", "%", "+", "*", "/", "-" };
-		String[] nam = new String[] { "Mul", "Mod", "Add", "Sub", "Div", "Sub" };
+		String[] nam = new String[] { "Mul", "Mod", "Add", "Sub", "NaiveDiv", "Sub" };
 		for(int i = 0; i<ops.length; i++) {
 			g2.writeFile(nam[i] + "Op.java", moSt.replace("MathOp", nam[i] + "Op").replace("%", ops[i]).replace("\"%\"", "\"mod\"").replace("\"/\"", "\"div\""));
 		}
@@ -106,14 +112,15 @@ public class Genie2 {
 		mathOpSrc = mathOpSrc.replace("##returntype##", "boolean").replace("##ReturnType##", "Boolean").replace("##returnCast##", "")
 				.replace("KRunnerBinOpBase", "DiadUniformBooleanBase").replace("##returnlisttype##", "BooleanCol");
 		moSt = mathOpTempl.apply(mathOpSrc);
-		ops = new String[] { "<", "<=", ">=", "==", ">", "!=" };
-		nam = new String[] { "LessThan", "LessThanOrEqual", "GreaterThanOrEqual", "NaiveEqual", "GreaterThan", "NotEqual" };
+		ops = new String[] { "<", "<=", "==", "!=" };
+		nam = new String[] { "NaiveLessThan", "NaiveLessThanOrEqual", "NaiveEqual", "NotEqual" };
 		for(int i = 0; i<ops.length; i++) {
 			g2.writeFile(nam[i] + "Op.java", moSt.replace("ComparisonOp", nam[i] + "Op").replace("%", ops[i]).replace("\"!=\"", "\"<>\""));
 		}
 
 		// Generate CastOp
-		Template castOpTempl = new Template(Collections.emptyMap(), getPairReplacements(p -> !p.a.equals(p.b)));
+		List<CTypeI> castTypes = Arrays.asList(BOOLEAN, SHORT, INTEGER, LONG, FLOAT, DOUBLE);
+		Template castOpTempl = new Template(Collections.emptyMap(), getPairReplacements(castTypes, p -> !p.a.equals(p.b)));
 		g2.writeFile("CastOp.java", castOpTempl.apply(g2.readFile("CastOp.template")));
 		
 		List<CTypeI> nonObjects = CType.ALL_NATIVE_TYPES.stream().filter(dt -> dt.getTypeNum()!=0).collect(Collectors.toList());
@@ -154,23 +161,23 @@ public class Genie2 {
 		String moops = genMon.readFile("MonoDoubleOp.template");
         String[] cmds = { "cos","sin","tan","acos","asin","atan","exp","log", "sqrt", "reciprocal" };
         for(String name : cmds) {
-        	String code = name.equals("reciprocal") ? "1/dc.get(i)" : "Math." + name + "(dc.get(i))";
+        	String code = name.equals("reciprocal") ? "1/d" : "Math." + name + "(d)";
             String s = moops.replace("$name$", name).replace("$Name$", name).replace("$code$", code);
     		genMon.writeFile(name + "Op.java", s);
         }
 
-        String[] monos = { "Abs","All","Any","Avg","Var","Not" };
+        String[] monos = { "NaiveAbs","All","Any","Avg","Var","Not" };
         for(String m : monos) {
         	genMon.writeFile(m+"Op.java", getTemplate(allTypes).apply(genMon.readFile(m+"Op.template")));
         }
     	genMon.writeFile("ColCreator.java", getTemplate(CType.ALL_NATIVE_TYPES).apply(genMon.readFile("ColCreator.template")));
 	}
 
-	private static Map<String, Function<String, String>> getPairReplacements(Predicate<Pair<CTypeI, CTypeI>> filter) {
-		Map<String, Function<String, String>> replacements = getTypeReplacements(CType.NUMERIC_TYPES);
+	private static Map<String, Function<String, String>> getPairReplacements(Collection<CTypeI> ctypes, Predicate<Pair<CTypeI, CTypeI>> filter) {
+		Map<String, Function<String, String>> replacements = getTypeReplacements(ctypes);
 		List<Pair<CTypeI,CTypeI>> castPairs = new ArrayList<>();
-        for(CTypeI dType : CType.NUMERIC_TYPES) {
-            for (CTypeI srcType : CType.NUMERIC_TYPES) {
+        for(CTypeI dType : ctypes) {
+            for (CTypeI srcType : ctypes) {
             	Pair<CTypeI, CTypeI> p = new Pair<>(srcType, dType);
             	if(filter.test(p)) {
             		castPairs.add(p);
@@ -193,8 +200,8 @@ public class Genie2 {
 	}
 
 	private static boolean isFloatingToWhole(Pair p) {
-		return (p.a.equals(CType.FLOAT)||p.a.equals(CType.DOUBLE)) 
-				&& (p.b.equals(CType.BOOLEAN) || p.b.equals(CType.SHORT) || p.b.equals(CType.INTEGER) || p.b.equals(CType.LONG)); 
+		return (p.a.equals(FLOAT)||p.a.equals(DOUBLE)) 
+				&& (p.b.equals(BOOLEAN) || p.b.equals(SHORT) || p.b.equals(INTEGER) || p.b.equals(LONG)); 
 	}
 	
 	private static HashMap<String, Function<String, String>> getFromToReplacements(Collection<Pair<CTypeI,CTypeI>> dataTypesToGenerate) {

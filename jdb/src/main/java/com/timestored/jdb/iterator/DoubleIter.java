@@ -6,6 +6,7 @@ import java.util.Arrays;
 import com.carrotsearch.hppc.DoubleArrayList;
 import com.timestored.jdb.database.CType;
 import com.timestored.jdb.function.ToDoubleFunction;
+
 import com.timestored.jdb.database.Dt;
 
 public interface DoubleIter {

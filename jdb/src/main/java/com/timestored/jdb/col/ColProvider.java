@@ -2,6 +2,7 @@ package com.timestored.jdb.col;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -35,17 +36,17 @@ public abstract class ColProvider {
 		return new DiskColProvider(folder);
 	}
 
-	private static final ObjectCol emptyObjectCol = new MemoryObjectCol(0);
+	public static final ObjectCol emptyObjectCol = new MemoryObjectCol(0);
 
-	private static final BooleanCol emptyBooleanCol = new MemoryBooleanCol(0);
+	public static final BooleanCol emptyBooleanCol = new MemoryBooleanCol(0);
 	private static final ByteCol emptyByteCol = new MemoryByteCol(0);
 	private static final ShortCol emptyShortCol = new MemoryShortCol(0);
 	private static final IntegerCol emptyIntegerCol = new MemoryIntegerCol(0);
-	private static final LongCol emptyLongCol = new MemoryLongCol(0);
+	public static final LongCol emptyLongCol = new MemoryLongCol(0);
 	private static final FloatCol emptyFloatCol = new MemoryFloatCol(0);
 	private static final DoubleCol emptyDoubleCol = new MemoryDoubleCol(0);
-	private static final CharacterCol emptyCharacterCol = new MemoryCharacterCol(0);
-	private static final StringCol emptyStringCol = new MemoryStringCol(0);
+	public static final CharacterCol emptyCharacterCol = new MemoryCharacterCol(0);
+	public static final StringCol emptyStringCol = new MemoryStringCol(0);
 	private static final LongCol emptyTimstampCol = new MemoryLongCol(0);
 	private static final LongCol emptyTimespanCol = new MemoryLongCol(0);
 	private static final IntegerCol emptyDateCol = new MemoryIntegerCol(0);
@@ -144,6 +145,10 @@ public abstract class ColProvider {
 			vals.set(i++, s);
 		}
 		return vals;
+	}
+	
+	public static MemoryStringCol toStringCol(String[] list) {
+		return toStringCol(Arrays.asList(list));
 	}
 	
 	public static CharacterCol toCharacterCol(String vals) {
@@ -261,6 +266,11 @@ public abstract class ColProvider {
     
     public static CharacterCol c() { return new MemoryCharacterCol(0); }
 	
+
+    public static LongCol j(List<Long> longVals) {
+    	return j(longVals.size(), i -> longVals.get(i));
+    }
+    
     public static LongCol j(int initialSize, Function<Integer,Long> f) {
     	LongCol r = new MemoryLongCol(initialSize);
     	for(int i=0; i<initialSize; i++) {
@@ -270,7 +280,7 @@ public abstract class ColProvider {
     }
     
     public static LongCol j(int initialSize, long constant) {
-    	return j(initialSize, i -> constant); 
+    	return initialSize == 0 ? emptyLongCol : j(initialSize, i -> constant); 
     }
     
     

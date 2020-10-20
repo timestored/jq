@@ -25,13 +25,15 @@ subprojects {
 	dependencies {
 		compile 'org.slf4j:slf4j-api:1.7.12'
 		compile 'com.google.guava:guava:26.0-jre'
+		compile 'it.unimi.dsi:fastutil:8.4.2'
 
 		compileOnly 'org.projectlombok:lombok:1.18.12'
 		annotationProcessor 'org.projectlombok:lombok:1.18.12'
 		testCompileOnly 'org.projectlombok:lombok:1.18.12'
 		testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
-		testCompile('junit:junit:4.13')
-		testImplementation('org.hamcrest:hamcrest-library:2.2')
+		testImplementation 'junit:junit:4.13'
+		testImplementation 'org.hamcrest:hamcrest-library:2.2'
+		testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
 	}
 	
 	test {
@@ -54,7 +56,7 @@ project(':jdb') {
         compile project(path: ':genie', configuration: 'shadow')
     }
 }
-project(':jq') {
+project(':jqi') {
     dependencies {
         implementation project(path: ':genie', configuration: 'shadow')
         implementation project(path: ':jdb', configuration: 'shadow')
