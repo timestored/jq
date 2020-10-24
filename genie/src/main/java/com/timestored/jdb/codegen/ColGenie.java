@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 import com.timestored.jdb.codegen.Genie;
 import com.timestored.jdb.database.CType;
+import com.timestored.jdb.database.CTypeI;
 
 public class ColGenie {
 
@@ -31,7 +32,7 @@ public class ColGenie {
 		Function<String,String> transformString = (String s) -> s.replace("itA.nextDouble() != itB.nextDouble()", "!Objects.equal(itA.nextString(), itB.nextString())");
 		transformString = transformString.compose(transformInt);
 		
-		Map<CType, Function<String, String>> transformMap = Maps.newHashMap();
+		Map<CTypeI, Function<String, String>> transformMap = Maps.newHashMap();
 		transformMap.put(CType.CHARACTER, transformChar);
 		transformMap.put(CType.INTEGER, transformInt);
 		transformMap.put(CType.BYTE, transformByte);
@@ -44,8 +45,8 @@ public class ColGenie {
 		
 		// The Disk columns should only be generated for native types. StringCOl is actually backed by an IntCol.
 
-		List<CType> typs = CType.builtinTypes().stream().filter(t -> !t.equals(CType.BOOLEAN)).collect(Collectors.toList());
-		for(String fn : new String[] { "DiskDoubleCol", "BaseDoubleCol", "MemoryDoubleCol"}) {
+		List<CTypeI> typs = CType.builtinTypes().stream().filter(t -> !t.equals(CType.BOOLEAN)).collect(Collectors.toList());
+		for(String fn : new String[] { "DiskDoubleCol", "BaseDoubleCol", "MemoryDoubleCol", "ProjectedDoubleCol"}) {
 			File dFile = new File(g.getPackageFile(), fn + ".java");
 			g.saveTransformedDoubleFile(dFile , typs, transformMap);
 		}

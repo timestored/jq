@@ -1,0 +1,112 @@
+package com.timestored.jq.ops;
+
+import com.timestored.jdb.database.SpecialValues;
+
+import static com.timestored.jq.ops.CastOp.CAST;
+import com.timestored.jdb.database.CType;
+import com.timestored.jq.ops.mono.TypeOp;
+import com.timestored.jdb.database.IntegerMappedVal;
+import com.timestored.jdb.database.LongMappedVal;
+import com.timestored.jdb.col.*;
+import com.timestored.jq.Frame;
+import lombok.Getter;
+import com.timestored.jq.Context;
+import lombok.Setter;
+
+public abstract class BaseDiad##Action## implements Diad {
+
+	@Getter @Setter protected Frame frame;
+	@Getter @Setter protected Context context;
+	
+	##FOReachTYPE##
+	public abstract ##returntype## ex(##type## a, ##type## b);
+	public abstract ##returnlisttype## ex(##type## a, ##listtype## b);
+	public abstract ##returnlisttype## ex(##listtype## a, ##type## b);
+	public abstract ##returnlisttype## ex(##listtype## a, ##listtype## b);
+	##FOReachTYPE##
+
+    public abstract Object ex(Object a, ObjectCol b);
+    public abstract Object ex(ObjectCol a, Object b);
+
+	private static boolean isTimeOrInt(short a) { return a>=16 || a<=19 || a==6 || a==7; }
+
+    public Object run(Object a, Object b) {
+	    
+	    
+		// Find the common type and cast both to it.
+		short ta = (short) Math.abs(TypeOp.TYPE.type(a));
+		short tb = (short) Math.abs(TypeOp.TYPE.type(b));
+		if(ta != tb && ta>0 && ta<20 && tb>0 && tb <20) {
+			String order = "bgxhijdefuvtn";
+			int ai = order.indexOf(CType.getType(ta).getCharacterCode());
+			int bi = order.indexOf(CType.getType(tb).getCharacterCode());
+			int maxi = ai > bi ? ai : bi;
+			char commonTypeChar = order.charAt(maxi);
+			a = ai == maxi ? a : CastOp.CAST.run(commonTypeChar, a); 
+			b = bi == maxi ? b : CastOp.CAST.run(commonTypeChar, b);
+		} else if(ta != tb) {
+			return Diad.mapEach(this, a, b);
+		}
+    
+
+	##FOReachTYPE##
+		if(a instanceof ##listtype## && b instanceof ##listtype##) {
+	        Col r = ex((##listtype##)a, (##listtype##)b);
+	        r.setType(((##listtype##)a).getType());
+	        return r;
+	    }  else if(a instanceof ##listtype## && b instanceof ##Type##) {
+	        Col r = ex((##listtype##)a, (##type##)b);
+	        r.setType(((##listtype##)a).getType());
+	        return r;
+	    }  else if(a instanceof ##Type## && b instanceof ##listtype##) {
+	        Col r = ex((##type##)a, (##listtype##)b);
+	        r.setType(((##listtype##)b).getType());
+	        return r;
+	    }  else if(a instanceof ##Type## && b instanceof ##Type##) {
+	        return ex((##type##)a, (##type##)b);
+	    } else  ##FOReachTYPE##
+
+
+
+	    	if(a instanceof IntegerCol && b instanceof IntegerMappedVal) {
+	        Col r = ex((IntegerCol)a, ((IntegerMappedVal)b).getInt());
+	        r.setType((short) -((IntegerMappedVal)b).getType());
+	        return r;
+	    }  else if(a instanceof IntegerMappedVal && b instanceof IntegerCol) {
+	        Col r = ex(((IntegerMappedVal)a).getInt(), (IntegerCol)b);
+	        r.setType((short) -((IntegerMappedVal)a).getType());
+	        return r;
+	    }  else if(a instanceof IntegerMappedVal && b instanceof IntegerMappedVal) {
+	    	IntegerMappedVal imvA = (IntegerMappedVal)a; 
+	        return ex(imvA.getInt(), ((IntegerMappedVal)b).getInt());
+	    } else
+	    
+
+	    	if(a instanceof LongCol && b instanceof LongMappedVal) {
+	        Col r = ex((LongCol)a, ((LongMappedVal)b).getLong());
+	        r.setType((short) -((LongMappedVal)b).getType());
+	        return r;
+	    }  else if(a instanceof LongMappedVal && b instanceof LongCol) {
+	        Col r = ex(((LongMappedVal)a).getLong(), (LongCol)b);
+	        r.setType((short) -((LongMappedVal)a).getType());
+	        return r;
+	    }  else if(a instanceof LongMappedVal && b instanceof LongMappedVal) {
+	    	LongMappedVal imvA = (LongMappedVal)a; 
+	        return ex(imvA.getLong(), ((LongMappedVal)b).getLong());
+	    } else
+
+    // Objects about to get complicated
+        if(a instanceof ObjectCol) {
+            ObjectCol aa = (ObjectCol) a;
+            if(b instanceof ObjectCol) {
+                ObjectCol ba = (ObjectCol) b;
+                return ex(aa, ba);
+            }
+            return ex(aa, b);
+        } else if(b instanceof ObjectCol) {
+            return ex(a, (ObjectCol)b);
+        }
+        throw new UnsupportedOperationException("bad type combo");
+    }
+    
+}

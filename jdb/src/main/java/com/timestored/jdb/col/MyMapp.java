@@ -81,5 +81,6 @@ public class MyMapp implements Mapp {
 	}
 
 	@Override public Col sort() { throw new NYIException(); }
+	@Override public IntegerCol iasc() { throw new NYIException(); }
 
 }

@@ -18,7 +18,6 @@ public interface DataReader {
 	void visit(DoubleCol doubleCol) throws IOException;
 	void visit(FloatCol floatCol) throws IOException;
 	void visit(StringCol stringCol) throws IOException;
-	void visit(DateCol dateCol) throws IOException;
 	void visit(ObjectCol mixedList) throws IOException;
 
 	void visit(boolean booleanVal) throws IOException;
@@ -56,8 +55,6 @@ public interface DataReader {
 			visit((StringCol) o);
 		} else if(o instanceof TimstampCol) {
 			visit((TimstampCol) o);
-		} else if(o instanceof DateCol) {
-			visit((DateCol) o);
 		} else if(o instanceof ObjectCol) {
 			visit((ObjectCol) o);
 		} else if(o instanceof Boolean) {

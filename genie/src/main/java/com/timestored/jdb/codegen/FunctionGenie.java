@@ -25,6 +25,7 @@ public class FunctionGenie {
 		
 		String consumerSrc = ST + "public interface <BIGTYPE>Consumer {	void accept(<NATIVETYPE> value); }";
 		String predicateSrc = ST + "public interface <BIGTYPE>Predicate { boolean test(<NATIVETYPE> value); }";
+		String predicatePairSrc = ST + "public interface <BIGTYPE>PairPredicate { boolean test(<NATIVETYPE> a, <NATIVETYPE> b); }";
 		String toFunctionSrc = ST + "public interface To<BIGTYPE>Function<T> { <NATIVETYPE> applyAs<BIGTYPE>(T value); }";
 		String monadToFunctionSrc = ST + "public interface MonadTo<BIGTYPE>Function { <NATIVETYPE> map(<NATIVETYPE> a); }";
 		String diadToFunctionSrc = ST + "public interface DiadTo<BIGTYPE>Function { <NATIVETYPE> map(<NATIVETYPE> a, <NATIVETYPE> b); }";
@@ -33,6 +34,7 @@ public class FunctionGenie {
 		
 		writeFilesForAllTypes(consumerSrc, "", "Consumer");
 		writeFilesForAllTypes(predicateSrc, "", "Predicate");
+		writeFilesForAllTypes(predicatePairSrc, "", "PairPredicate");
 		writeFilesForAllTypes(toFunctionSrc, "To", "Function");
 		writeFilesForAllTypes(monadToFunctionSrc, "MonadTo", "Function");
 		writeFilesForAllTypes(diadToFunctionSrc, "DiadTo", "Function");

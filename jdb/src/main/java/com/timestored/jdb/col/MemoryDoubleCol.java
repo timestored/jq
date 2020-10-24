@@ -21,6 +21,13 @@ public class MemoryDoubleCol extends BaseDoubleCol {
 	private double[] v;
 	
 	public MemoryDoubleCol() { this(MemoryCol.DEFAULT_SIZE); }
+
+	public MemoryDoubleCol(DoubleCol doubleCol) {
+		this(doubleCol.size());
+		for(int i=0; i<size(); i++) {
+			v[i] = doubleCol.get(i);
+		}
+	}
 	
 	public MemoryDoubleCol(int initialSize) {
 		Preconditions.checkArgument(initialSize >= 0);
@@ -109,5 +116,10 @@ public class MemoryDoubleCol extends BaseDoubleCol {
 		Arrays.parallelSort(v);
 		this.sorted = true;
 		return this;
+	}
+	
+
+	@Override public IntegerCol iasc() {
+		return new MemoryIntegerCol(ArrayUtils.iasc(v));
 	}
 }

@@ -6,10 +6,10 @@ public class Consts {
 		public static final boolean BOOLEAN = false;
 		public static final byte BYTE = Byte.MIN_VALUE;
 		public static final short SHORT = Short.MIN_VALUE;
-		public static final int INTEGER = Integer.MIN_VALUE;
-		public static final long LONG = Long.MIN_VALUE;
-		public static final float FLOAT = Float.NEGATIVE_INFINITY;
-		public static final double DOUBLE = Double.NEGATIVE_INFINITY;
+		public static final int INTEGER = SpecialValues.nwi;
+		public static final long LONG = SpecialValues.nwj;
+		public static final float FLOAT = SpecialValues.nwe;
+		public static final double DOUBLE = SpecialValues.nwf;
 		public static final long TIMESTAMP = LONG;
 		public static final char CHARACTER = Character.MIN_VALUE;
 	}
@@ -19,10 +19,10 @@ public class Consts {
 		public static final boolean BOOLEAN = true;
 		public static final byte BYTE = Byte.MAX_VALUE;
 		public static final short SHORT = Short.MAX_VALUE;
-		public static final int INTEGER = Integer.MAX_VALUE;
-		public static final long LONG = Long.MAX_VALUE;
-		public static final float FLOAT = Float.POSITIVE_INFINITY;
-		public static final double DOUBLE = Double.POSITIVE_INFINITY;
+		public static final int INTEGER = SpecialValues.wi;
+		public static final long LONG = SpecialValues.wj;
+		public static final float FLOAT = SpecialValues.we;
+		public static final double DOUBLE = SpecialValues.wf;
 		public static final long TIMESTAMP = LONG;
 		public static final char CHARACTER = Character.MAX_VALUE;
 	}
@@ -32,10 +32,10 @@ public class Consts {
 		public static final boolean BOOLEAN = false;
 		public static final byte BYTE = Byte.MIN_VALUE;
 		public static final short SHORT = Short.MIN_VALUE;
-		public static final int INTEGER = Integer.MIN_VALUE;
-		public static final long LONG = Long.MIN_VALUE;
-		public static final float FLOAT = Float.NaN;
-		public static final double DOUBLE = Double.NaN;
+		public static final int INTEGER = SpecialValues.ni;
+		public static final long LONG = SpecialValues.nj;
+		public static final float FLOAT = SpecialValues.ne;
+		public static final double DOUBLE = SpecialValues.nf;
 		public static final long TIMESTAMP = LONG;
 		public static final char CHARACTER = Character.MIN_VALUE;
 	}

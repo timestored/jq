@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -43,7 +44,7 @@ public enum CType implements CTypeI {
 			'p', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
 	MONTH((short)-13, (short)4, "Month", "Month", Month.class, java.sql.Types.TIMESTAMP_WITH_TIMEZONE,
 			'm', new Integer(ni), new Integer(wi), new Integer(nwi)),
-	DATE((short)-14, (short)4, "Date", "Date", java.sql.Date.class, java.sql.Types.DATE,
+	DT((short)-14, (short)4, "Dt", "Dt", Dt.class, java.sql.Types.DATE,
 			'd', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
 	TIMESPAN((short)-16, (short)8, "Timespan", "Timespan", Timespan.class, java.sql.Types.TIME_WITH_TIMEZONE, // WRONG
 			'n', new Timstamp(nj), new Timstamp(wj), new Timstamp(nwj)),
@@ -79,7 +80,8 @@ public enum CType implements CTypeI {
 		this.negInfinity = null;
 	}
 
-	private static final Collection<CType> BUILTIN_TYPES = Sets.immutableEnumSet(BOOLEAN, BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE, CHARACTER );
+	private static final Collection<CTypeI> BUILTIN_TYPES = new HashSet<>();
+	static { BUILTIN_TYPES.addAll(Sets.immutableEnumSet(BOOLEAN, BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE, CHARACTER)); }
 
 	private static final Map<Class<?>, CType> LOOKUP = 
 			Maps.uniqueIndex(Arrays.asList(CType.values()), CType::getJavaClass);    
@@ -101,24 +103,18 @@ public enum CType implements CTypeI {
 	@Nullable public static CType fromSqlType(int sqlTypeNum) {
         return SQL_TYPE_LOOKUP.get(sqlTypeNum);
     }
-	
-	public static Collection<CType> builtinTypes() { return BUILTIN_TYPES; }
-	public static Collection<CType> allTypes() { return Arrays.asList(CType.values()); }
 
-	public static final Collection<CTypeI> NUMERIC_TYPES = new HashSet<>();
+	public static Collection<CTypeI> builtinTypes() { return BUILTIN_TYPES; }
+	public static Collection<CTypeI> allTypes() { return Arrays.asList(CType.values()); }
+
 	public static final Collection<CTypeI> ALL_NATIVE_TYPES = new HashSet<>();
 	static {
-		NUMERIC_TYPES.addAll(Arrays.asList(BOOLEAN, SHORT, INTEGER, LONG, FLOAT, DOUBLE));
-		ALL_NATIVE_TYPES.addAll(NUMERIC_TYPES);
-		ALL_NATIVE_TYPES.add(BYTE);
-		ALL_NATIVE_TYPES.add(CHARACTER);
-		ALL_NATIVE_TYPES.add(STRING);
-		for(CTypeI d : NUMERIC_TYPES) {
+		Collection<CTypeI> atomTypes = new HashSet<>();
+		atomTypes.addAll(Arrays.asList(BOOLEAN, SHORT, INTEGER, LONG, FLOAT, DOUBLE, BYTE, CHARACTER, STRING));
+		ALL_NATIVE_TYPES.addAll(atomTypes);
+		for(CTypeI d : atomTypes) {
 			ALL_NATIVE_TYPES.add(new ListWrapper(d));
 		}
-		ALL_NATIVE_TYPES.add(new ListWrapper(BYTE));
-		ALL_NATIVE_TYPES.add(new ListWrapper(CHARACTER));
-		ALL_NATIVE_TYPES.add(new ListWrapper(STRING));
 		ALL_NATIVE_TYPES.add(new ListWrapper(OBJECT));
 	}
 	
@@ -138,8 +134,8 @@ public enum CType implements CTypeI {
 		@Override public String getNativeJavaName() { return dt.getLongJavaName() + "Col"; }
 		@Override public CTypeI getListType() { return this; }
 		@Override public String getQName() { return dt.getQName(); }
-		@Override public String toString() { return "ListOf" + dt.toString();
-		}
+		@Override public String toString() { return "ListOf" + dt.toString(); }
+		@Override public String name() { return dt.name(); }
 	}
 
 	/** For a given class return the KdbType or null if none apply */
@@ -219,6 +215,7 @@ public enum CType implements CTypeI {
 	public String getQName() {
 		String n = this.name();
 		switch(n){
+			case "DT": return "date";
 			case "FLOAT": return "real";
 			case "DOUBLE": return "float";
 			case "CHARACTER": return "char";

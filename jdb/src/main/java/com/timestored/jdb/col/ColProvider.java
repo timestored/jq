@@ -2,6 +2,7 @@ package com.timestored.jdb.col;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -25,7 +26,6 @@ public abstract class ColProvider {
 	public abstract ShortCol createShortCol(String identifier) throws IOException;
 	public abstract CharacterCol createCharacterCol(String identifier) throws IOException;
 	public abstract ObjectCol createObjectCol(String identifier) throws IOException;
-	public abstract DateCol createDateCol(String identifier) throws IOException;
 	
 
 	public static ColProvider getInMemory() {
@@ -36,20 +36,20 @@ public abstract class ColProvider {
 		return new DiskColProvider(folder);
 	}
 
-	private static final ObjectCol emptyObjectCol = new MemoryObjectCol(0);
+	public static final ObjectCol emptyObjectCol = new MemoryObjectCol(0);
 
-	private static final BooleanCol emptyBooleanCol = new MemoryBooleanCol(0);
+	public static final BooleanCol emptyBooleanCol = new MemoryBooleanCol(0);
 	private static final ByteCol emptyByteCol = new MemoryByteCol(0);
 	private static final ShortCol emptyShortCol = new MemoryShortCol(0);
 	private static final IntegerCol emptyIntegerCol = new MemoryIntegerCol(0);
-	private static final LongCol emptyLongCol = new MemoryLongCol(0);
+	public static final LongCol emptyLongCol = new MemoryLongCol(0);
 	private static final FloatCol emptyFloatCol = new MemoryFloatCol(0);
 	private static final DoubleCol emptyDoubleCol = new MemoryDoubleCol(0);
-	private static final CharacterCol emptyCharacterCol = new MemoryCharacterCol(0);
-	private static final StringCol emptyStringCol = new MemoryStringCol(0);
+	public static final CharacterCol emptyCharacterCol = new MemoryCharacterCol(0);
+	public static final StringCol emptyStringCol = new MemoryStringCol(0);
 	private static final LongCol emptyTimstampCol = new MemoryLongCol(0);
 	private static final LongCol emptyTimespanCol = new MemoryLongCol(0);
-	private static final DateCol emptyDateCol = new MemoryDateCol(0);
+	private static final IntegerCol emptyDateCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptySecondCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptyMinuteCol = new MemoryIntegerCol(0);
 	private static final IntegerCol emptyTimeCol = new MemoryIntegerCol(0);
@@ -60,6 +60,7 @@ public abstract class ColProvider {
 		emptyTimeCol.setType((short) -CType.TIME.getTypeNum());
 		emptyTimstampCol.setType((short) -CType.TIMSTAMP.getTypeNum());
 		emptyTimespanCol.setType((short) -CType.TIMESPAN.getTypeNum());
+		emptyDateCol.setType((short) -CType.DT.getTypeNum());
 		
 		if(Database.QCOMPATIBLE) {
 			emptyBooleanCol.setSorted(false);
@@ -130,7 +131,6 @@ public abstract class ColProvider {
 		public ByteCol createByteCol(String identifier) { return new MemoryByteCol(); } 
 		public ShortCol createShortCol(String identifier) { return new MemoryShortCol(); } 
 		public CharacterCol createCharacterCol(String identifier) { return new MemoryCharacterCol(); } 
-		public DateCol createDateCol(String identifier) { return new MemoryDateCol(5); } 
 	}
 
 	public static MemoryStringCol toStringCol(Collection<String> ls) {
@@ -145,6 +145,10 @@ public abstract class ColProvider {
 			vals.set(i++, s);
 		}
 		return vals;
+	}
+	
+	public static MemoryStringCol toStringCol(String[] list) {
+		return toStringCol(Arrays.asList(list));
 	}
 	
 	public static CharacterCol toCharacterCol(String vals) {
@@ -163,7 +167,6 @@ public abstract class ColProvider {
 		case BOOLEAN:	return new MemoryBooleanCol(initialSize);
 		case BYTE:	return new MemoryByteCol(initialSize);
 		case CHARACTER:	return new MemoryCharacterCol(initialSize);
-		case DATE:	return new MemoryDateCol(initialSize);
 		case DOUBLE:	return new MemoryDoubleCol(initialSize);
 		case FLOAT:	return new MemoryFloatCol(initialSize);
 		case INTEGER:	return new MemoryIntegerCol(initialSize);
@@ -171,6 +174,7 @@ public abstract class ColProvider {
 		case SHORT:	return new MemoryShortCol(initialSize);
 		case STRING:	return new MemoryStringCol(initialSize);
 		case TIME:	return new MemoryIntegerCol(initialSize);
+		case DT:
 		case MINUTE:	
 		case OBJECT:	
 		case SECOND:		
@@ -262,6 +266,11 @@ public abstract class ColProvider {
     
     public static CharacterCol c() { return new MemoryCharacterCol(0); }
 	
+
+    public static LongCol j(List<Long> longVals) {
+    	return j(longVals.size(), i -> longVals.get(i));
+    }
+    
     public static LongCol j(int initialSize, Function<Integer,Long> f) {
     	LongCol r = new MemoryLongCol(initialSize);
     	for(int i=0; i<initialSize; i++) {
@@ -271,7 +280,7 @@ public abstract class ColProvider {
     }
     
     public static LongCol j(int initialSize, long constant) {
-    	return j(initialSize, i -> constant); 
+    	return initialSize == 0 ? emptyLongCol : j(initialSize, i -> constant); 
     }
     
     

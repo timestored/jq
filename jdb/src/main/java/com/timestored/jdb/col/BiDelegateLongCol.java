@@ -31,5 +31,6 @@ public class BiDelegateLongCol<T> extends BiDelegateCol {
 	public boolean contains(T needle) { return col.contains(convert.applyAsLong(needle)); }
 	public int find(T needle) { return col.find(convert.applyAsLong(needle)); }
 	@Override public void setObject(int i, Object value) { col.set(i, convert.applyAsLong((T) value)); }
-	@Override public Col sort() { throw new NYIException(); }
+	@Override public Col sort() { col.sort(); return this; }
+	@Override public IntegerCol iasc() { return col.iasc(); }
 }

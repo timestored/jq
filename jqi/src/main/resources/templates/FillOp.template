@@ -1,0 +1,50 @@
+package com.timestored.jq.ops; 
+import static com.timestored.jdb.database.SpecialValues.*;
+import com.timestored.jdb.col.*;
+import com.timestored.jdb.kexception.NYIException;
+import static com.timestored.jdb.database.SpecialValues.isNull;
+import com.timestored.jq.ops.mono.TypeOp;
+
+public class FillOp extends BaseCastingDiadUniform {
+	public static FillOp INSTANCE = new FillOp(); 
+	@Override public String name() { return "^"; }
+
+	@Override public Object run(Object a, Object b) {
+		short ta = TypeOp.TYPE.type(a);
+		if(a instanceof StringCol && b instanceof StringCol) {
+			return ex((StringCol)a, (StringCol)b);
+	    }  else if(a instanceof String && b instanceof StringCol) {
+	    	return ex((String)a, (StringCol)b);
+	    }  else if(a instanceof String && b instanceof String) {
+	        return ex((String)a, (String)b);
+
+		//2j ^ "b c"
+	    } else if(b instanceof CharacterCol) {
+	    	if(ta<0) {
+				return ex((char) CastOp.CAST.run((short)10, a), (CharacterCol)b);	
+	    	}
+			return ex((CharacterCol) CastOp.CAST.run((short)10, a), (CharacterCol)b);	
+	    }  else if(b instanceof Character && ta<0) {
+			return ex((char) CastOp.CAST.run((short)10, a), (Character)b);	
+	    }
+
+		return super.run(a, b);
+	}
+
+    public String ex(String a, String b)		{ return (String) (isNull(b) ? a : b); }
+    public StringCol ex(String a, StringCol b)	{ return isNull(a) ? b : b.each(v -> isNull(v) ? a : v); }
+    public StringCol ex(StringCol a, StringCol b){return a.map(b, (x,y) ->  isNull(y) ? x : y); }
+    	
+    public char ex(char a, char b)						{ return isNull(b) ? a : b; }
+    public CharacterCol ex(char a, CharacterCol b)		{ return isNull(a) ? b : b.each(v -> isNull(v) ? a : v); }
+    public CharacterCol ex(CharacterCol a, CharacterCol b){return a.map(b, (x,y) ->  isNull(y) ? x : y); }
+
+	/** Generated for each type **/
+    ##FOReachTYPE##	
+    @Override public ##type## ex(##type## a, ##type## b)			{ return ##cast## (isNull(b) ? a : b); }
+    @Override public ##listtype## ex(##type## a, ##listtype## b)	{ return isNull(a) ? b : b.each(v -> isNull(v) ? a : v); }
+    @Override public ##listtype## ex(##listtype## a, ##type## b)	{ throw new NYIException(); }
+    @Override public ##listtype## ex(##listtype## a, ##listtype## b){ return a.map(b, (x,y) ->  isNull(y) ? x : y); }
+    ##FOReachTYPE##	
+    
+}

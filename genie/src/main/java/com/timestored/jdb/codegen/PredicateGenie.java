@@ -15,6 +15,7 @@ import com.timestored.jdb.codegen.Genie;
 import com.timestored.jdb.codegen.Template;
 import com.timestored.jdb.codegen.Template.TypedTemplate;
 import com.timestored.jdb.database.CType;
+import com.timestored.jdb.database.CTypeI;
 
 public class PredicateGenie {
 	
@@ -23,13 +24,13 @@ public class PredicateGenie {
 
 	static void generateSuperPredicates() throws IOException {
 		
-		Map<String,Function<CType,String>> typeLookups = Maps.newHashMap();
+		Map<String,Function<CTypeI,String>> typeLookups = Maps.newHashMap();
 		typeLookups.put("type", t ->t.getNativeJavaName());
 		typeLookups.put("Type", t -> t.getLongJavaName());
-		Set<CType> types = Sets.newHashSet(CType.builtinTypes());
+		Set<CTypeI> types = Sets.newHashSet(CType.builtinTypes());
 		types.add(CType.STRING);
 		types.remove(CType.BOOLEAN);
-		TypedTemplate<CType> typeTemplate = new Template.TypedTemplate<>(types, typeLookups);
+		TypedTemplate<CTypeI> typeTemplate = new Template.TypedTemplate<CTypeI>(types, typeLookups);
 		
 
 		Map<String,Function<String,String>> funcLookups = Maps.newHashMap();
@@ -57,7 +58,7 @@ public class PredicateGenie {
 	 */
 	static void generateTypeSpecificPredicates() throws IOException {
 
-		Set<CType> types = Sets.newHashSet(CType.builtinTypes());
+		Set<CTypeI> types = Sets.newHashSet(CType.builtinTypes());
 		types.remove(CType.BOOLEAN);
 		File dFile = new File(g.getPackageFile(), "DoublePredicates.java");
 		g.saveTransformedDoubleFile(dFile , types);

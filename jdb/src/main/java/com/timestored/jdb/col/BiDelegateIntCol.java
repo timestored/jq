@@ -29,4 +29,5 @@ public class BiDelegateIntCol<T> extends BiDelegateCol {
 	@Override public void setObject(int i, Object value) { col.set(i, convert.applyAsInt((T) value)); }
 
 	@Override public Col sort() { col.sort(); return this; }
+	@Override public IntegerCol iasc() { return col.iasc(); }
 }

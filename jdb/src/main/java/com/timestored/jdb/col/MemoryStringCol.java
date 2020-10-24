@@ -7,6 +7,13 @@ public class MemoryStringCol extends IntegerBackedStringCol {
 		super(new MemoryIntegerCol(size));
 	}
 
+	public MemoryStringCol(String[] vals) {
+		super(new MemoryIntegerCol(vals.length));
+		for(int i=0;i<vals.length;i++) {
+			set(i, vals[i]);	
+		}
+	}
+	
 	public MemoryStringCol(String val) {
 		super(new MemoryIntegerCol(1));
 		set(0, val);

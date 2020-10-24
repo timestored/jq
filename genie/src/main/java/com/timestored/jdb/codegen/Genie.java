@@ -7,11 +7,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.google.common.io.Files;
 import com.timestored.jdb.database.CType;
+import com.timestored.jdb.database.CTypeI;
 
 import lombok.Getter;
 
@@ -28,13 +30,15 @@ public class Genie {
 	@Getter private String packageName;
 
 	public static void main(String... args) throws IOException {
-		PROJECT_ORIGIN = new File(args[0], "jdb");
-		PROJECT_TARGET = new File(PROJECT_ORIGIN,"build" + File.separator + "generated-src");
+		if(args.length > 0) {
+			PROJECT_ORIGIN = new File(args[0], "jdb");
+			PROJECT_TARGET = new File(PROJECT_ORIGIN,"build" + File.separator + "generated-src");
+		}
 		ColGenie.generate();
 		IteratorGenie.generate();
 		PredicateGenie.generate();
 		FunctionGenie.generate();
-		Genie2.main(args);
+		Genie2.main(new File(PROJECT_ORIGIN, "..").getAbsolutePath());
 	}
 
 	
@@ -61,7 +65,7 @@ public class Genie {
 	
 
 	
-	public void saveTransformedDoubleFile(File srcDoubleFile, Collection<CType> ctypes) throws IOException {
+	public void saveTransformedDoubleFile(File srcDoubleFile, Collection<CTypeI> ctypes) throws IOException {
 		saveTransformedDoubleFile(srcDoubleFile, ctypes, Collections.emptyMap());
 	}
 	
@@ -72,8 +76,8 @@ public class Genie {
 	 *          as some functions are called int, some integer.
 	 *  @param srcDoubleFile A file that may include type specific comments that are replaced {@see #replaceTypeSpecificComments(CType, String)}
 	 */ 
-	public void saveTransformedDoubleFile(File srcDoubleFile, Collection<CType> ctypes, Map<CType,Function<String,String>> specialTransforms) throws IOException {
-		saveTransformedFile(CType.DOUBLE, srcDoubleFile, ctypes, specialTransforms);
+	public void saveTransformedDoubleFile(File srcDoubleFile, Collection<CTypeI> typs, Map<CTypeI,Function<String,String>> specialTransforms) throws IOException {
+		saveTransformedFile(CType.DOUBLE, srcDoubleFile, typs, specialTransforms);
 	}
 
 
@@ -83,11 +87,11 @@ public class Genie {
 	 *          as some functions are called int, some integer.
 	 *  @param srcFile A file that may include type specific comments that are replaced {@see #replaceTypeSpecificComments(CType, String)}
 	 */ 
-	public void saveTransformedFile(CType cType, File srcFile, Collection<CType> ctypes, Map<CType,Function<String,String>> specialTransforms) throws IOException {
+	public void saveTransformedFile(CTypeI cType, File srcFile, Collection<CTypeI> typs, Map<CTypeI,Function<String,String>> specialTransforms) throws IOException {
 		System.out.printf("srcFile = " + srcFile);
 		String s = Files.toString(srcFile, Charset.defaultCharset());
 		
-		for(CType typ : ctypes) {
+		for(CTypeI typ : typs) {
 			if(!typ.equals(cType)) {
 				String transformedSrc = s;
 				// special case as relying on call from java memoryByteBuffer
@@ -118,7 +122,7 @@ public class Genie {
 	 * Given type specific escape sequences in text e.g. **TYPE=INTEGER blah **
 	 * remove them for the other types and uncomment them for that specific type.
 	 */
-	static String replaceTypeSpecificComments(CType typ, String src) {
+	static String replaceTypeSpecificComments(CTypeI typ, String src) {
 		String s = src;
 		while(s.contains(PRE)) {
 			int p = s.indexOf(PRE);

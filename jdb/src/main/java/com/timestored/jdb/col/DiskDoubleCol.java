@@ -150,6 +150,10 @@ class DiskDoubleCol extends BaseDoubleCol {
 		return false;
 	}
 
+	@Override public IntegerCol iasc() {
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override public DoubleCol sort() {
 		MemoryDoubleCol m = new MemoryDoubleCol(this.size());
 		try {

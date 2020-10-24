@@ -11,9 +11,15 @@ import java.io.IOException;
 /**TYPE=MONTH import com.timestored.jdb.database.Month; **/
 /**TYPE=TIME import com.timestored.jdb.database.Time; **/
 import com.timestored.jdb.database.CType;
+import com.timestored.jdb.function.BooleanPairPredicate;
+import com.timestored.jdb.function.DiadToBooleanFunction;
 import com.timestored.jdb.function.DiadToDoubleFunction;
+import com.timestored.jdb.function.DoublePairPredicate;
 import com.timestored.jdb.function.DoublePredicate;
+import com.timestored.jdb.function.MonadToBooleanFunction;
+import com.timestored.jdb.database.Dt;
 import com.timestored.jdb.function.MonadToDoubleFunction;
+import com.timestored.jdb.function.MonadToObjectFunction;
 import com.timestored.jdb.iterator.DoubleIter;
 import com.timestored.jdb.iterator.Locations;
 
@@ -27,12 +33,13 @@ public interface DoubleCol extends Col {
 	boolean addAll(DoubleCol doubleCol) throws IOException;
 
 	DoubleCol sort();
+	IntegerCol iasc();
 	
 	void set(int i, double val);
 	double get(int i);
 	
 	void setType(short type);
-	@Override default short getType() { return CType.DOUBLE.getTypeNum(); }
+	@Override default short getType() { return (short) (-1*CType.DOUBLE.getTypeNum()); }
 	@Override default short getSizeInBytes() { return CType.DOUBLE.getSizeInBytes(); }
 	
 
@@ -81,5 +88,15 @@ public interface DoubleCol extends Col {
 	public default DoubleCol map(double d) {
 		return map((a) -> d);
 	}
+
+	double over(double initVal, DiadToDoubleFunction f);
+	double over(DiadToDoubleFunction f);
+	DoubleCol scan(double initVal, DiadToDoubleFunction f);
+	DoubleCol scan(DiadToDoubleFunction f);
+	DoubleCol eachPrior(double initVal, DiadToDoubleFunction f);
+	DoubleCol eachPrior(DiadToDoubleFunction f);
+	BooleanCol eachPrior(boolean initVal, DoublePairPredicate f);
+
+	DoubleCol each(MonadToDoubleFunction f);
 }
 

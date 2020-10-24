@@ -16,6 +16,7 @@ import com.timestored.jdb.function.ToStringFunction;
 /**TYPE=TIMESPAN import com.timestored.jdb.database.Timespan; **/
 /**TYPE=MONTH import com.timestored.jdb.database.Month; **/
 /**TYPE=TIME import com.timestored.jdb.database.Time; **/
+/**TYPE=DT import com.timestored.jdb.database.Dt; **/
 
 
 public interface StringIter {

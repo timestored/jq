@@ -1,0 +1,41 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.col.BooleanCol;
+import com.timestored.jdb.database.SpecialValues;
+import com.timestored.jdb.col.*;
+import com.timestored.jq.ops.CastOp;
+import com.timestored.jdb.database.Database;
+
+public class AvgOp extends MonadReduceToDouble {
+	public static AvgOp INSTANCE = new AvgOp();
+	@Override public String name() { return "avg"; }
+
+	@Override
+	public Object run(Object a) {
+		if(Database.QCOMPATIBLE && a instanceof ObjectCol) {
+			if(((ObjectCol) a).size() == 0) {
+				return SpecialValues.nf;
+			}
+		}
+		return super.run(a);
+	}
+
+	##FOReachATOM## 
+    public double ex(##type## a)   { return CastOp.CAST.f(a); }  ##FOReachATOM## 
+
+	##FOReachLIST## 
+    public double ex(##type## a) {
+        if(a.size() == 0) { return SpecialValues.nf; }
+        int count = 0;
+        double sum = 0;
+        for(int i=0; i<a.size(); i++) {
+        	if(!SpecialValues.isNull(a.get(i))) {
+	            sum += (a.get(i) ##fromCast##);
+	            count++;
+            }
+        };
+        return sum/count;
+    }
+	##FOReachLIST## 
+
+}

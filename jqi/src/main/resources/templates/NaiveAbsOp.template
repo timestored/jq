@@ -1,0 +1,14 @@
+package com.timestored.jq.ops.mono;
+
+import com.timestored.jdb.col.*;
+
+public class NaiveAbsOp extends MonadReduceToSameObject {
+	@Override public String name() { return "abs"; }
+
+	##FOReachATOM## 
+    public ##type## ex(##type## a)   { return ##cast## Math.abs(a ##fromCast##) ##toCast##; }  ##FOReachATOM## 
+
+	##FOReachLIST## 
+    public ##type## ex(##type## a) { return a.map(b -> ##cast## (Math.abs(b ##fromCast##)) ##toCast##); }  ##FOReachLIST## 
+
+}

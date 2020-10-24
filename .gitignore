@@ -27,6 +27,10 @@ bin
 .gradle
 .classpath
 .project
-
-# Intellij files
 .idea
+
+/jqi/NewTrade
+/jqi/data/foo
+/jqi/mytable.dat
+/jqi/work.dat
+

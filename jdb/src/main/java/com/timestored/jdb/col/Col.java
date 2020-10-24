@@ -21,6 +21,7 @@ public interface Col extends AutoCloseable {
 	Locations select(Locations locations, PredicateFactory predicateFactory);
 	Col select(Locations locations);
 	Col sort();
+	IntegerCol iasc();
 	
 	int size();
 	

@@ -8,8 +8,9 @@ dependencies {
 	implementation 'com.google.guava:guava:26.0-jre'
 	
 	api 'com.carrotsearch:hppc:0.8.1'
-	api 'io.netty:netty-transport:4.1.4.Final'
-	api 'io.netty:netty-handler:4.1.4.Final'
+	api 'io.netty:netty-transport:4.1.52.Final'
+	api 'io.netty:netty-handler:4.1.52.Final'
+	compileOnly 'com.oracle.substratevm:svm:19.2.1'
 }
  
 jar {

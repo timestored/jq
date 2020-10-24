@@ -1,0 +1,31 @@
+package com.timestored.jq.ops; 
+import com.timestored.jdb.col.*;
+
+public class AndOp extends BaseCastingDiadUniform {
+	public static AndOp INSTANCE = new AndOp(); 
+	@Override public String name() { return "and"; }
+
+    @Override public Boolean ex(boolean a, boolean b) { return  a && b; }
+    @Override public BooleanCol ex(boolean a, BooleanCol b) { return ex(b, a); }
+    @Override public BooleanCol ex(BooleanCol a, boolean b) { return ColProvider.b(a.size(), i -> b && a.get(i)); }
+    @Override public BooleanCol ex(BooleanCol a, BooleanCol b) { return a.map(b, (x,y) -> x && y); }
+    
+    @Override public Byte ex(byte a, byte b) { return  (byte) Math.min(a, b); }
+    @Override public ByteCol ex(ByteCol a, byte b) { return ex(b,a); }
+    @Override public ByteCol ex(byte a, ByteCol b) { return ColProvider.x(b.size(), i -> (byte) Math.min(a, b.get(i))); }
+    @Override public ByteCol ex(ByteCol a, ByteCol b)		{ return a.map(b, (x,y) -> (byte) Math.min(x, y)); }  	
+    
+    @Override public char ex(char a, char b) { return (char) Math.min(a, b); }
+    @Override public CharacterCol ex(CharacterCol a, char b) { return ex(b,a); }
+    @Override public CharacterCol ex(char a, CharacterCol b) { return ColProvider.c(b.size(), i -> (char) Math.min(a, b.get(i))); }
+    @Override public CharacterCol ex(CharacterCol a, CharacterCol b) { return a.map(b, (x,y) -> (char) Math.min(x, y)); }	
+	
+    ##FOReachTYPE##	
+    @Override public ##type## ex(##type## a, ##type## b) { return ##cast## Math.min(a, b); }
+    @Override public ##listtype## ex(##listtype## a, ##type## b) { return ex(b,a); }
+    @Override public ##listtype## ex(##type## a, ##listtype## b) { return ColProvider.##typeChar##(b.size(), i -> ##cast## Math.min(a, b.get(i))); }
+    ##FOReachTYPE##	
+
+    ##FOReachTYPE##	
+    @Override public ##listtype## ex(##listtype## a, ##listtype## b)		{ return a.map(b, (x,y) -> ##cast## Math.min(x, y)); }  ##FOReachTYPE##	
+}
