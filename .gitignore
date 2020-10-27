@@ -26,6 +26,7 @@ bin
 .classpath
 .project
 .idea
+.gradle
 
 /jqi/NewTrade
 /jqi/data/foo
