@@ -1,5 +1,6 @@
 
 # jq - An implementation of q on the JVM
+![Java CI with Gradle](https://github.com/timestored/jq/workflows/Java%20CI%20with%20Gradle/badge.svg)
 
 ## About
 
