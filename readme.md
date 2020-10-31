@@ -2,6 +2,8 @@
 # jq - An implementation of q on the JVM
 ![Java CI with Gradle](https://github.com/timestored/jq/workflows/Java%20CI%20with%20Gradle/badge.svg)
 
+[![jq running code](http://www.timestored.com/jq/images/jq-video.png)](https://youtu.be/zCRkKmGxsX4)
+
 ## About
 
 Jq is an implementation of the [q language](https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems))
